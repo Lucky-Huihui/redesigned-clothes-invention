@@ -99,7 +99,7 @@ export default function CategoryManage() {
                     </div>
                   )}
                 </div>
-                {!cat.is_default && editingId !== cat.id && (
+                {editingId !== cat.id && (
                   <div className="flex gap-1">
                     <button onClick={() => { setEditingId(cat.id); setEditName(cat.name); }}
                       className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600">

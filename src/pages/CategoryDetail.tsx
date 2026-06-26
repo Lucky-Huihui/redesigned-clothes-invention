@@ -53,8 +53,10 @@ export default function CategoryDetail() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
         <h1 className="text-base font-semibold text-gray-900">{category?.name || '加载中...'}</h1>
-        <button onClick={() => navigate('/categories/manage')} className="text-sm font-medium px-2 py-1 rounded-lg"
-          style={{ color: colors.primary }}>管理</button>
+        <div className="flex items-center gap-1">
+          <button onClick={() => navigate(`/items/new/${categoryId}`)} className="text-sm font-semibold px-3 py-1.5 rounded-full text-white transition-transform active:scale-95"
+            style={{ background: colors.primary }}>+ 添加</button>
+        </div>
       </nav>
 
       {/* Item Waterfall Grid */}

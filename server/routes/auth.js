@@ -9,12 +9,13 @@ const router = Router();
 const DEFAULT_CATEGORIES = [
   { name: '上装', icon: '👕', sort_order: 0 },
   { name: '下装', icon: '👖', sort_order: 1 },
-  { name: '袜子', icon: '🧦', sort_order: 2 },
-  { name: '鞋子', icon: '👟', sort_order: 3 },
-  { name: '发饰', icon: '🎀', sort_order: 4 },
-  { name: '耳饰', icon: '💎', sort_order: 5 },
-  { name: '外套', icon: '🧥', sort_order: 6 },
-  { name: '背包', icon: '🎒', sort_order: 7 },
+  { name: '连衣裙', icon: '👗', sort_order: 2 },
+  { name: '外套', icon: '🧥', sort_order: 3 },
+  { name: '鞋子', icon: '👟', sort_order: 4 },
+  { name: '袜子', icon: '🧦', sort_order: 5 },
+  { name: '背包', icon: '🎒', sort_order: 6 },
+  { name: '发饰', icon: '🎀', sort_order: 7 },
+  { name: '耳饰', icon: '💎', sort_order: 8 },
 ];
 
 // Register

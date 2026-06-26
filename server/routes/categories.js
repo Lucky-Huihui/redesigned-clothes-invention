@@ -55,7 +55,6 @@ router.delete('/:id', authMiddleware, (req, res) => {
     'SELECT * FROM categories WHERE id = ? AND user_id = ?'
   ).get(req.params.id, req.userId);
   if (!cat) return res.status(404).json({ error: '分类不存在' });
-  if (cat.is_default) return res.status(403).json({ error: '默认分类不可删除' });
 
   db.prepare('DELETE FROM categories WHERE id = ?').run(req.params.id);
   res.json({ message: '删除成功' });
