@@ -1,60 +1,48 @@
 export type Gender = 'MALE' | 'FEMALE';
 export type Theme = 'PINK' | 'GRAY';
 export type ReactionType = 'LIKE' | 'FAVORITE' | 'DISLIKE';
-export type LoginType = 'PHONE' | 'EMAIL';
 
-export interface User {
-  userId: string;
-  avatar?: string;
+export interface AppUser {
+  id: string;
+  phone: string | null;
+  email: string | null;
   nickname: string;
-  password: string;
+  avatar: string;
   gender: Gender;
-  phone?: string;
-  email?: string;
-}
-
-export interface Category {
-  categoryId: string;
-  userId: string;
-  name: string;
-  isDefault: boolean;
-}
-
-export interface Item {
-  itemId: string;
-  categoryId: string;
-  userId: string;
-  imageUrl: string;
-  name: string;
-  createTime: string;
-  price?: number;
-}
-
-export interface Outfit {
-  outfitId: string;
-  userId: string;
-  items: string[];
-  resultImageUrl?: string;
-  createTime: string;
-}
-
-export interface Reaction {
-  reactionId: string;
-  userId: string;
-  outfitId: string;
-  type: ReactionType;
-}
-
-export interface AppState {
-  users: User[];
-  currentUserId: string | null;
-  categories: Category[];
-  items: Item[];
-  outfits: Outfit[];
-  reactions: Reaction[];
   theme: Theme;
+  created_at: string;
 }
 
-export interface OutfitDraft {
-  selections: Record<string, string>; // categoryId -> itemId
+export interface AppCategory {
+  id: string;
+  user_id: string;
+  name: string;
+  icon: string;
+  is_default: number;
+  sort_order: number;
+}
+
+export interface AppItem {
+  id: string;
+  user_id: string;
+  category_id: string;
+  name: string;
+  image: string;
+  price: number | null;
+  category_name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AppOutfit {
+  id: string;
+  user_id: string;
+  items: string[];
+  result_image: string;
+  feedback: ReactionType | null;
+  created_at: string;
+}
+
+export interface OutfitDraftSelection {
+  selections: Record<string, string>;
 }

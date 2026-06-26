@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搭配选择 - 衣橱搭配</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen antialiased" style="max-width: 375px; margin: 0 auto;">
+
+    <!-- Header -->
+    <header class="flex items-center justify-center px-4 pt-3 pb-2" style="height: 56px;">
+        <h1 class="text-heading-2" style="font-size: var(--font-size-xl); letter-spacing: -0.01em;">搭配</h1>
+    </header>
+
+    <!-- Progress Indicator -->
+    <section class="flex items-center justify-center gap-0 px-8 py-4" aria-label="搭配进度">
+        <!-- Step 1: 上装 (completed) -->
+        <div class="flex flex-col items-center gap-1">
+            <div class="step-circle completed">
+                <i data-lucide="check" style="width: 14px; height: 14px;"></i>
+            </div>
+            <span class="text-caption" style="font-size: 10px; color: var(--color-primary);">上装</span>
+        </div>
+        <div class="step-line done"></div>
+        <!-- Step 2: 下装 (current) -->
+        <div class="flex flex-col items-center gap-1">
+            <div class="step-circle current">2</div>
+            <span class="text-caption" style="font-size: 10px; color: var(--color-text-secondary);">下装</span>
+        </div>
+        <div class="step-line pending"></div>
+        <!-- Step 3: 鞋子 (pending) -->
+        <div class="flex flex-col items-center gap-1">
+            <div class="step-circle pending">3</div>
+            <span class="text-caption" style="font-size: 10px; color: var(--color-text-tertiary);">鞋子</span>
+        </div>
+    </section>
+
+    <!-- Category Tabs -->
+    <section class="px-4 pb-3">
+        <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" role="tablist">
+            <button class="category-pill active" role="tab" aria-selected="true">上装</button>
+            <button class="category-pill" role="tab" aria-selected="false">下装</button>
+            <button class="category-pill" role="tab" aria-selected="false">袜子</button>
+            <button class="category-pill" role="tab" aria-selected="false">
+                鞋子
+                <span class="required-dot"></span>
+            </button>
+            <button class="category-pill" role="tab" aria-selected="false">发饰</button>
+            <button class="category-pill" role="tab" aria-selected="false">耳饰</button>
+            <button class="category-pill" role="tab" aria-selected="false">外套</button>
+            <button class="category-pill" role="tab" aria-selected="false">背包</button>
+        </div>
+    </section>
+
+    <!-- Selected Items Preview -->
+    <section class="px-4 pb-3">
+        <div class="flex items-center gap-3">
+            <span class="text-caption" style="color: var(--color-text-tertiary); white-space: nowrap;">已选</span>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar">
+                <!-- Selected: white blouse -->
+                <div class="selected-preview">
+                    <span style="font-size: 18px;">👚</span>
+                    <div class="mini-check">
+                        <i data-lucide="check" style="width: 10px; height: 10px; color: white;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Divider -->
+    <div style="height: 1px; background: var(--color-border-light); margin: 0 16px;"></div>
+
+    <!-- Item Grid -->
+    <section class="px-4 pt-4 pb-4" aria-label="物品列表">
+        <div class="grid grid-cols-3 gap-3">
+            <!-- Item 1 (selected) -->
+            <div class="item-card selected" role="button" tabindex="0" aria-label="白色衬衫 已选择">
+                <div class="item-thumb" style="background-color: #F9FAFB;">
+                    <span>👚</span>
+                    <div class="check-overlay">
+                        <i data-lucide="check" style="width: 12px; height: 12px; color: white;"></i>
+                    </div>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-primary); font-weight: var(--font-weight-medium);">白色衬衫</span>
+                </div>
+            </div>
+            <!-- Item 2 -->
+            <div class="item-card" role="button" tabindex="0" aria-label="粉色T恤">
+                <div class="item-thumb" style="background-color: #FDF2F8;">
+                    <span>👕</span>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-secondary);">粉色T恤</span>
+                </div>
+            </div>
+            <!-- Item 3 -->
+            <div class="item-card" role="button" tabindex="0" aria-label="针织毛衣">
+                <div class="item-thumb" style="background-color: #F3F4F6;">
+                    <span>🧶</span>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-secondary);">针织毛衣</span>
+                </div>
+            </div>
+            <!-- Item 4 -->
+            <div class="item-card" role="button" tabindex="0" aria-label="条纹吊带">
+                <div class="item-thumb" style="background-color: #FEF3C7;">
+                    <span>👗</span>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-secondary);">条纹吊带</span>
+                </div>
+            </div>
+            <!-- Item 5 -->
+            <div class="item-card" role="button" tabindex="0" aria-label="蕾丝上衣">
+                <div class="item-thumb" style="background-color: #FCEEF5;">
+                    <span>👚</span>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-secondary);">蕾丝上衣</span>
+                </div>
+            </div>
+            <!-- Item 6 -->
+            <div class="item-card" role="button" tabindex="0" aria-label="雪纺衫">
+                <div class="item-thumb" style="background-color: #EFF6FF;">
+                    <span>👔</span>
+                </div>
+                <div class="px-2 py-2 text-center">
+                    <span class="text-caption" style="color: var(--color-text-secondary);">雪纺衫</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Spacer for bottom area -->
+    <div class="flex-1"></div>
+
+    <!-- Bottom CTA Area -->
+    <section class="px-4 pt-3 pb-2" style="padding-bottom: calc(16px + 64px);">
+        <button class="cta-button disabled" data-dom-id="start-tryon" disabled aria-label="开始试穿">
+            请选择必选分类物品
+        </button>
+    </section>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full flex items-center justify-around px-6"
+         style="max-width: 375px; height: 64px; background: var(--color-surface); border-top: 1px solid var(--color-border-light);"
+         aria-label="底部导航">
+        <button class="tab-bar-item" data-dom-id="tab-items" aria-label="物品">
+            <i data-lucide="shirt" style="width: 22px; height: 22px;"></i>
+            <span>物品</span>
+        </button>
+        <button class="tab-bar-item active" aria-label="搭配" aria-current="page">
+            <i data-lucide="palette" style="width: 22px; height: 22px;"></i>
+            <span>搭配</span>
+        </button>
+        <button class="tab-bar-item" data-dom-id="tab-profile" aria-label="个人中心">
+            <i data-lucide="user" style="width: 22px; height: 22px;"></i>
+            <span>个人中心</span>
+        </button>
+    </nav>
+
+    <script>lucide.createIcons();</script>
+
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-full);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+      }
+      .step-circle.completed {
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+      }
+      .step-circle.current {
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+        box-shadow: 0 0 0 3px var(--color-primary-light);
+      }
+      .step-circle.pending {
+        background-color: var(--color-bg-tertiary);
+        color: var(--color-text-tertiary);
+      }
+      .step-line {
+        height: 2px;
+        flex: 1;
+        max-width: 40px;
+        transition: background-color var(--transition-fast);
+      }
+      .step-line.done { background-color: var(--color-primary); }
+      .step-line.pending { background-color: var(--color-border); }
+      .category-pill {
+        flex-shrink: 0;
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        white-space: nowrap;
+        transition: background-color var(--transition-fast), color var(--transition-fast);
+        cursor: pointer;
+        position: relative;
+        border: none;
+        outline: none;
+      }
+      .category-pill.active {
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+      }
+      .category-pill:not(.active) {
+        background-color: var(--color-bg-tertiary);
+        color: var(--color-text-secondary);
+      }
+      .required-dot {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 6px;
+        height: 6px;
+        border-radius: var(--radius-full);
+        background-color: var(--state-error);
+      }
+      .item-card {
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        cursor: pointer;
+        transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        position: relative;
+        background: var(--color-surface);
+      }
+      .item-card:active { transform: scale(0.97); }
+      .item-card.selected {
+        box-shadow: 0 0 0 2px var(--color-primary);
+      }
+      .item-thumb {
+        width: 100%;
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        position: relative;
+      }
+      .check-overlay {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 22px;
+        height: 22px;
+        border-radius: var(--radius-full);
+        background-color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .selected-preview {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-full);
+        border: 2px solid var(--color-primary);
+        overflow: hidden;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        background: var(--color-surface);
+        position: relative;
+      }
+      .selected-preview .mini-check {
+        position: absolute;
+        bottom: -1px;
+        right: -1px;
+        width: 16px;
+        height: 16px;
+        border-radius: var(--radius-full);
+        background-color: var(--color-primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .tab-bar-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        font-size: 10px;
+        color: var(--color-text-tertiary);
+        cursor: pointer;
+        padding: 4px 0;
+        transition: color var(--transition-fast);
+        background: none;
+        border: none;
+        outline: none;
+      }
+      .tab-bar-item.active {
+        color: var(--color-primary);
+      }
+      .cta-button {
+        width: 100%;
+        padding: 14px 24px;
+        border-radius: var(--radius-full);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        text-align: center;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        transition: background-color var(--transition-fast), opacity var(--transition-fast);
+      }
+      .cta-button.enabled {
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+      }
+      .cta-button.disabled {
+        background-color: var(--color-bg-tertiary);
+        color: var(--color-text-tertiary);
+        cursor: not-allowed;
+      }
+    </style>
+</body>
+</html>

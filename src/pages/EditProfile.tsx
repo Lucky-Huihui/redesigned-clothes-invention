@@ -1,183 +1,141 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Trash2 } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { updateUser, deleteAccount, logout } from '@/store/slices/authSlice';
-import { clearUserCategories } from '@/store/slices/categorySlice';
-import { clearUserItems } from '@/store/slices/itemSlice';
-import { clearUserOutfits } from '@/store/slices/outfitSlice';
-import { clearUserReactions } from '@/store/slices/reactionSlice';
-import ImageUploader from '@/components/ImageUploader';
-import Modal from '@/components/Modal';
-import Toast from '@/components/Toast';
-import type { Gender } from '@/types';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector, useAppDispatch } from '@/store';
+import { updateUser, logout } from '@/store/slices/authSlice';
+import { updateProfile, changePassword, deleteAccount } from '@/api/auth';
+import { getThemeColors } from '@/utils/theme';
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const userId = useAppSelector((s) => s.auth.currentUserId);
-  const user = useAppSelector((s) => s.auth.users.find((u) => u.userId === userId));
+  const user = useAppSelector((s) => s.auth.user);
   const theme = useAppSelector((s) => s.theme.theme);
+  const colors = getThemeColors(theme);
 
   const [nickname, setNickname] = useState(user?.nickname || '');
-  const [avatar, setAvatar] = useState(user?.avatar || '');
-  const [gender, setGender] = useState<Gender>(user?.gender || 'FEMALE');
+  const [gender, setGender] = useState<'MALE' | 'FEMALE'>(user?.gender || 'FEMALE');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [showDelete, setShowDelete] = useState(false);
-  const [toast, setToast] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  if (!user || !userId) return null;
-
-  const handleSave = () => {
-    const updates: Partial<typeof user> & { userId: string } = {
-      userId,
-      nickname: nickname.trim(),
-      gender,
-    };
-    if (avatar) updates.avatar = avatar;
-    if (oldPassword && newPassword) {
-      if (oldPassword !== user.password) {
-        setToast('旧密码不正确');
-        return;
-      }
-      updates.password = newPassword;
-      setOldPassword('');
-      setNewPassword('');
+  const handleSaveProfile = async () => {
+    if (!nickname.trim()) { setMessage('昵称不能为空'); return; }
+    setLoading(true); setMessage('');
+    try {
+      const updated = await updateProfile({ nickname: nickname.trim(), gender });
+      dispatch(updateUser(updated));
+      setMessage('资料已更新');
+    } catch (err: any) {
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
     }
-    dispatch(updateUser(updates));
-    setToast('资料已保存');
   };
 
-  const handleDelete = () => {
-    dispatch(clearUserCategories(userId));
-    dispatch(clearUserItems(userId));
-    dispatch(clearUserOutfits(userId));
-    dispatch(clearUserReactions(userId));
-    dispatch(deleteAccount(userId));
-    dispatch(logout());
-    localStorage.removeItem('closetmate_state');
-    navigate('/login');
+  const handleChangePassword = async () => {
+    if (!oldPassword || !newPassword) { setMessage('请填写完整'); return; }
+    if (newPassword.length < 6) { setMessage('新密码不能少于6位'); return; }
+    setLoading(true); setMessage('');
+    try {
+      await changePassword(oldPassword, newPassword);
+      setOldPassword(''); setNewPassword(''); setShowPassword(false);
+      setMessage('密码修改成功');
+    } catch (err: any) {
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const bg = theme === 'PINK' ? 'bg-[#FFF5F7]' : 'bg-[#F8F9FA]';
-  const primaryText = theme === 'PINK' ? 'text-[#FF6B81]' : 'text-[#2C3E50]';
-  const primaryBg = theme === 'PINK' ? 'bg-[#FF6B81]' : 'bg-[#2C3E50]';
-  const radius = theme === 'PINK' ? 'rounded-2xl' : 'rounded-lg';
+  const handleDeleteAccount = async () => {
+    if (!confirm('确定要注销账号吗？此操作不可撤销，所有数据将被永久删除。')) return;
+    if (!confirm('再次确认：注销后所有数据将无法恢复！')) return;
+    setLoading(true);
+    try {
+      await deleteAccount();
+      dispatch(logout());
+      navigate('/login');
+    } catch (err: any) {
+      setMessage(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className={`min-h-screen ${bg}`}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 bg-white/90 px-5 py-4 backdrop-blur">
-        <Link to="/profile" className={primaryText}>
-          <ArrowLeft size={24} />
-        </Link>
-        <h1 className={`text-lg font-bold ${primaryText}`}>编辑资料</h1>
-      </header>
-
-      <main className="mx-auto max-w-md space-y-4 px-4 pt-6">
-        <section className={`bg-white p-5 shadow-sm ${radius}`}>
-          <div className="mx-auto w-fit">
-            <ImageUploader
-              value={avatar}
-              onChange={setAvatar}
-              className="h-24 w-24 rounded-full"
-            />
-          </div>
-        </section>
-
-        <section className={`space-y-4 bg-white p-5 shadow-sm ${radius}`}>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">昵称</label>
-            <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-gray-400"
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">性别</label>
-            <div className="flex gap-3">
-              {(['FEMALE', 'MALE'] as Gender[]).map((g) => (
-                <button
-                  key={g}
-                  onClick={() => setGender(g)}
-                  className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors ${
-                    gender === g
-                      ? `${primaryBg} border-transparent text-white`
-                      : 'border-gray-200 bg-white text-gray-600'
-                  }`}
-                >
-                  {g === 'FEMALE' ? '女' : '男'}
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-xs text-gray-400">性别将决定 AI 试穿使用的模特</p>
-          </div>
-        </section>
-
-        <section className={`space-y-4 bg-white p-5 shadow-sm ${radius}`}>
-          <h3 className="font-bold text-gray-700">修改密码</h3>
-          <input
-            type="password"
-            placeholder="旧密码"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-gray-400"
-          />
-          <input
-            type="password"
-            placeholder="新密码"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-gray-400"
-          />
-        </section>
-
-        <button
-          onClick={handleSave}
-          className={`w-full py-3.5 font-bold text-white shadow-md transition-transform active:scale-95 ${primaryBg} ${radius}`}
-        >
-          保存修改
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto', background: colors.bgSecondary }}>
+      <nav className="sticky top-0 z-20 flex items-center justify-center h-14 px-4 bg-white border-b" style={{ borderColor: colors.borderLight }}>
+        <button onClick={() => navigate('/profile')} className="absolute left-4 w-9 h-9 flex items-center justify-center rounded-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
+        <h1 className="text-base font-semibold text-gray-900">编辑资料</h1>
+      </nav>
 
-        <button
-          onClick={() => setShowDelete(true)}
-          className={`flex w-full items-center justify-center gap-2 py-3.5 font-bold text-red-500 shadow-sm transition-transform active:scale-95 bg-white ${radius}`}
-        >
-          <Trash2 size={18} />
+      {message && (
+        <div className={`mx-4 mt-4 p-3 rounded-lg text-sm ${message.includes('成功') || message.includes('已更新') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+          {message}
+        </div>
+      )}
+
+      {/* Profile Form */}
+      <section className="mx-4 mt-4 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-500 mb-1.5">昵称</label>
+          <input type="text" value={nickname} onChange={e => setNickname(e.target.value)}
+            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-500 mb-2">性别</label>
+          <div className="flex gap-2.5">
+            <button onClick={() => setGender('FEMALE')}
+              className="flex-1 h-11 rounded-lg text-sm font-medium transition-all"
+              style={{
+                background: gender === 'FEMALE' ? colors.primary : colors.bgTertiary,
+                color: gender === 'FEMALE' ? colors.textOnPrimary : colors.textSecondary,
+                border: gender === 'FEMALE' ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`,
+              }}>女</button>
+            <button onClick={() => setGender('MALE')}
+              className="flex-1 h-11 rounded-lg text-sm font-medium transition-all"
+              style={{
+                background: gender === 'MALE' ? colors.primary : colors.bgTertiary,
+                color: gender === 'MALE' ? colors.textOnPrimary : colors.textSecondary,
+                border: gender === 'MALE' ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`,
+              }}>男</button>
+          </div>
+        </div>
+        <button onClick={handleSaveProfile} disabled={loading}
+          className="w-full h-11 rounded-full text-white text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-50"
+          style={{ background: colors.primary }}>保存资料</button>
+      </section>
+
+      {/* Password Form */}
+      <section className="mx-4 mt-4 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
+        <h2 className="text-sm font-semibold text-gray-900 mb-4">修改密码</h2>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-500 mb-1.5">原密码</label>
+          <input type={showPassword ? 'text' : 'password'} value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="请输入原密码"
+            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-500 mb-1.5">新密码</label>
+          <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="请输入新密码（至少6位）"
+            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+        </div>
+        <button onClick={handleChangePassword} disabled={loading}
+          className="w-full h-11 rounded-full text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-50"
+          style={{ background: colors.primary, color: colors.textOnPrimary }}>修改密码</button>
+      </section>
+
+      {/* Delete Account */}
+      <section className="mx-4 mt-4 mb-8 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
+        <button onClick={handleDeleteAccount} disabled={loading}
+          className="w-full h-11 rounded-full border-2 border-red-300 text-red-400 text-sm font-semibold active:bg-red-50 transition-colors disabled:opacity-50">
           注销账号
         </button>
-      </main>
-
-      <Modal
-        open={showDelete}
-        title="确认注销账号"
-        onClose={() => setShowDelete(false)}
-        footer={
-          <>
-            <button
-              onClick={() => setShowDelete(false)}
-              className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-600"
-            >
-              取消
-            </button>
-            <button
-              onClick={handleDelete}
-              className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-semibold text-white"
-            >
-              确认注销
-            </button>
-          </>
-        }
-      >
-        <p className="text-sm text-gray-600">
-          注销后将删除您的所有数据，包括衣物、分类、搭配和互动记录，此操作不可恢复。
-        </p>
-      </Modal>
-
-      {toast && <Toast message={toast} onClose={() => setToast('')} />}
+        <p className="text-xs text-gray-400 text-center mt-2">注销后所有数据将被永久删除且无法恢复</p>
+      </section>
     </div>
   );
 }

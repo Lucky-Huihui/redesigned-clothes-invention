@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>衣橱搭配 - 物品首页</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Header -->
+    <header style="padding: 16px 20px 0; display: flex; align-items: center; justify-content: center; position: relative;">
+      <h1 style="font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); letter-spacing: -0.01em; text-wrap: balance;">我的衣橱</h1>
+      <button aria-label="搜索" style="position: absolute; right: 20px; top: 16px; background: none; border: none; cursor: pointer; padding: 4px; color: var(--color-text-secondary);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Stats bar -->
+    <div style="padding: 8px 20px 16px; text-align: center;">
+      <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">共 42 件物品 · 8 个分类</span>
+    </div>
+
+    <!-- Category grid -->
+    <main style="padding: 0 20px 100px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+
+        <!-- 上装 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">👕</div>
+          <span class="cat-name">上装</span>
+          <span class="cat-count">12 件</span>
+        </div>
+
+        <!-- 下装 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">👖</div>
+          <span class="cat-name">下装</span>
+          <span class="cat-count">8 件</span>
+        </div>
+
+        <!-- 袜子 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">🧦</div>
+          <span class="cat-name">袜子</span>
+          <span class="cat-count">6 件</span>
+        </div>
+
+        <!-- 鞋子 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">👟</div>
+          <span class="cat-name">鞋子</span>
+          <span class="cat-count">5 件</span>
+        </div>
+
+        <!-- 发饰 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">🎀</div>
+          <span class="cat-name">发饰</span>
+          <span class="cat-count">4 件</span>
+        </div>
+
+        <!-- 耳饰 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">💎</div>
+          <span class="cat-name">耳饰</span>
+          <span class="cat-count">3 件</span>
+        </div>
+
+        <!-- 外套 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">🧥</div>
+          <span class="cat-name">外套</span>
+          <span class="cat-count">2 件</span>
+        </div>
+
+        <!-- 背包 -->
+        <div class="cat-card" data-dom-id="category-card">
+          <div class="cat-icon">👜</div>
+          <span class="cat-name">背包</span>
+          <span class="cat-count">2 件</span>
+        </div>
+
+        <!-- 添加分类 -->
+        <div class="cat-card-add" data-dom-id="category-card" style="grid-column: 1 / -1;">
+          <div class="add-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+          </div>
+          <span style="font-size: var(--font-size-sm); color: var(--color-text-tertiary); font-weight: var(--font-weight-medium);">添加分类</span>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FAB -->
+    <button class="fab" aria-label="添加物品">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12h14"/>
+      </svg>
+    </button>
+
+    <!-- Bottom tab bar -->
+    <nav class="tab-bar">
+      <!-- 物品 (active) -->
+      <div class="tab-item tab-active">
+        <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <span class="tab-label">物品</span>
+      </div>
+      <!-- 搭配 -->
+      <div class="tab-item tab-inactive" data-dom-id="tab-outfit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        <span class="tab-label">搭配</span>
+      </div>
+      <!-- 个人中心 -->
+      <div class="tab-item tab-inactive" data-dom-id="tab-profile">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="tab-label">个人中心</span>
+      </div>
+    </nav>
+  </div>
+
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: var(--color-bg);
+      overflow-x: hidden;
+    }
+    /* Category card */
+    .cat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border-light);
+      border-radius: var(--radius-lg);
+      border-left: 3px solid var(--color-primary);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform 150ms cubic-bezier(.2,.8,.2,1), box-shadow 150ms cubic-bezier(.2,.8,.2,1);
+    }
+    .cat-card:active {
+      transform: translateY(0) scale(0.98);
+    }
+    .cat-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-primary-bg);
+      border-radius: var(--radius-md);
+      font-size: 24px;
+    }
+    .cat-name {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+    .cat-count {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-tertiary);
+    }
+    /* Add card */
+    .cat-card-add {
+      background: transparent;
+      border: 2px dashed var(--color-border);
+      border-left: 2px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color 150ms ease, background 150ms ease;
+    }
+    .cat-card-add:active {
+      background: var(--color-bg-secondary);
+    }
+    .add-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-md);
+      font-size: 24px;
+      color: var(--color-text-tertiary);
+    }
+    /* Tab bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      height: 64px;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: var(--z-sticky);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tab-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .tab-label {
+      font-size: 10px;
+      font-weight: var(--font-weight-medium);
+    }
+    .tab-active svg { color: var(--color-primary); }
+    .tab-active .tab-label { color: var(--color-primary); }
+    .tab-inactive svg { color: var(--color-text-tertiary); }
+    .tab-inactive .tab-label { color: var(--color-text-tertiary); }
+    /* FAB */
+    .fab {
+      position: fixed;
+      bottom: 84px;
+      right: calc(50% - 375px / 2 + 20px);
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(232, 160, 191, 0.35);
+      cursor: pointer;
+      z-index: var(--z-sticky);
+      border: none;
+      transition: transform 150ms cubic-bezier(.2,.8,.2,1), box-shadow 150ms cubic-bezier(.2,.8,.2,1);
+    }
+    .fab:active {
+      transform: scale(0.95);
+    }
+    @media (max-width: 375px) {
+      .fab { right: 20px; }
+    }
+    @media (min-width: 376px) {
+      .fab { right: calc(50% - 375px / 2 + 20px); }
+    }
+  </style>
+</body>
+</html>

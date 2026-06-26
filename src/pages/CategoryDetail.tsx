@@ -1,189 +1,120 @@
-import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Plus, MoreVertical, Edit3, Trash2 } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { addItem, updateItem, removeItem } from '@/store/slices/itemSlice';
-import ImageUploader from '@/components/ImageUploader';
-import Modal from '@/components/Modal';
-import BottomNav from '@/components/BottomNav';
-
-interface ItemFormData {
-  name: string;
-  price: string;
-  imageUrl: string;
-}
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getCategories } from '@/api/categories';
+import { getItems, deleteItem } from '@/api/items';
+import { useAppSelector } from '@/store';
+import { getThemeColors, formatDate } from '@/utils/theme';
+import type { AppCategory, AppItem } from '@/types';
 
 export default function CategoryDetail() {
   const { categoryId } = useParams<{ categoryId: string }>();
-  const dispatch = useAppDispatch();
-  const userId = useAppSelector((s) => s.auth.currentUserId);
+  const navigate = useNavigate();
   const theme = useAppSelector((s) => s.theme.theme);
-  const category = useAppSelector((s) =>
-    s.categories.categories.find((c) => c.categoryId === categoryId)
-  );
-  const items = useAppSelector((s) =>
-    s.items.items.filter((i) => i.categoryId === categoryId && i.userId === userId)
-  );
+  const colors = getThemeColors(theme);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<string | null>(null);
-  const [form, setForm] = useState<ItemFormData>({ name: '', price: '', imageUrl: '' });
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [category, setCategory] = useState<AppCategory | null>(null);
+  const [items, setItems] = useState<AppItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const bg = theme === 'PINK' ? 'bg-[#FFF5F7]' : 'bg-[#F8F9FA]';
-  const primaryText = theme === 'PINK' ? 'text-[#FF6B81]' : 'text-[#2C3E50]';
-  const primaryBg = theme === 'PINK' ? 'bg-[#FF6B81]' : 'bg-[#2C3E50]';
-  const radius = theme === 'PINK' ? 'rounded-2xl' : 'rounded-lg';
-
-  const openAdd = () => {
-    setEditingItem(null);
-    setForm({ name: '', price: '', imageUrl: '' });
-    setModalOpen(true);
-  };
-
-  const openEdit = (item: typeof items[number]) => {
-    setEditingItem(item.itemId);
-    setForm({ name: item.name, price: item.price ? String(item.price) : '', imageUrl: item.imageUrl });
-    setModalOpen(true);
-    setActiveMenu(null);
-  };
-
-  const handleSubmit = () => {
-    if (!categoryId || !userId || !form.name.trim() || !form.imageUrl) return;
-    const price = form.price ? parseFloat(form.price) : undefined;
-    if (editingItem) {
-      dispatch(updateItem({ itemId: editingItem, name: form.name.trim(), price, imageUrl: form.imageUrl }));
-    } else {
-      dispatch(addItem({ userId, categoryId, name: form.name.trim(), imageUrl: form.imageUrl, price }));
+  const loadData = useCallback(async () => {
+    try {
+      const cats = await getCategories();
+      const cat = cats.find(c => c.id === categoryId);
+      setCategory(cat || null);
+      const its = await getItems(categoryId!);
+      setItems(its);
+    } catch (err) {
+      console.error('Failed to load:', err);
+    } finally {
+      setLoading(false);
     }
-    setModalOpen(false);
-  };
+  }, [categoryId]);
 
-  const handleDelete = (itemId: string) => {
-    dispatch(removeItem(itemId));
-    setActiveMenu(null);
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
-  if (!category) return <div className="p-10 text-center">分类不存在</div>;
+  const handleDelete = async (itemId: string) => {
+    if (!confirm('确定要删除这个物品吗？')) return;
+    try {
+      await deleteItem(itemId);
+      setItems(prev => prev.filter(i => i.id !== itemId));
+    } catch (err: any) {
+      alert(err.message || '删除失败');
+    }
+  };
 
   return (
-    <div className={`min-h-screen pb-24 ${bg}`}>
-      <header className="sticky top-0 z-10 flex items-center justify-between bg-white/90 px-5 py-4 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <Link to="/items" className={primaryText}>
-            <ArrowLeft size={24} />
-          </Link>
-          <h1 className={`text-lg font-bold ${primaryText}`}>{category.name}</h1>
-        </div>
-        <button onClick={openAdd} className={`rounded-full p-2 text-white ${primaryBg}`}>
-          <Plus size={20} />
+    <div className="min-h-screen" style={{ background: colors.bgSecondary, fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto' }}>
+      {/* Top Nav */}
+      <nav className="sticky top-0 z-20 flex items-center justify-between px-4 h-14 border-b"
+        style={{ background: colors.bg, borderColor: colors.borderLight, boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+        <button onClick={() => navigate('/items')} className="flex items-center justify-center w-9 h-9 -ml-1 rounded-lg text-gray-900">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
         </button>
-      </header>
+        <h1 className="text-base font-semibold text-gray-900">{category?.name || '加载中...'}</h1>
+        <button onClick={() => navigate('/categories/manage')} className="text-sm font-medium px-2 py-1 rounded-lg"
+          style={{ color: colors.primary }}>管理</button>
+      </nav>
 
-      <main className="mx-auto max-w-md px-4 pt-4">
-        {items.length === 0 ? (
-          <div className="py-20 text-center text-gray-400">
-            该分类下还没有物品
-            <br />
-            <button onClick={openAdd} className={`mt-3 text-sm font-medium ${primaryText}`}>
-              添加第一件物品
-            </button>
+      {/* Item Waterfall Grid */}
+      <div className="px-3 pt-3 pb-24">
+        {loading ? (
+          <div className="text-center py-12 text-gray-400">加载中...</div>
+        ) : items.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-4xl mb-3">📭</div>
+            <p className="text-gray-400 text-sm">还没有物品，点击下方按钮添加</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {items.map((item) => (
-              <div
-                key={item.itemId}
-                className={`relative bg-white p-3 shadow-sm ${radius}`}
+          <div className="columns-2 gap-3 space-y-3">
+            {items.map(item => (
+              <div key={item.id}
+                className="break-inside-avoid rounded-xl overflow-hidden transition-transform duration-200 cursor-pointer active:scale-[0.97]"
+                style={{ background: colors.bg, boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}
+                onClick={() => navigate(`/items/${item.id}`)}
               >
-                <div className="relative overflow-hidden" style={{ aspectRatio: '1/1' }}>
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="h-full w-full rounded-lg object-cover"
-                  />
-                  <button
-                    onClick={() => setActiveMenu(activeMenu === item.itemId ? null : item.itemId)}
-                    className="absolute right-2 top-2 rounded-full bg-black/30 p-1 text-white"
-                  >
-                    <MoreVertical size={16} />
-                  </button>
-                  {activeMenu === item.itemId && (
-                    <div className="absolute right-2 top-10 flex flex-col gap-1 rounded-lg bg-white p-1 shadow-lg">
-                      <button
-                        onClick={() => openEdit(item)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700"
-                      >
-                        <Edit3 size={14} /> 编辑
-                      </button>
-                      <button
-                        onClick={() => handleDelete(item.itemId)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-red-500"
-                      >
-                        <Trash2 size={14} /> 删除
-                      </button>
+                <div className="relative">
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className="w-full object-cover" style={{ aspectRatio: '3/4', background: colors.primaryBg }} />
+                  ) : (
+                    <div className="w-full flex items-center justify-center text-4xl" style={{ aspectRatio: '3/4', background: colors.primaryBg }}>
+                      👗
                     </div>
                   )}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center opacity-60 hover:opacity-100"
+                    style={{ background: colors.bg, color: colors.textTertiary }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                  </button>
                 </div>
-                <p className="mt-2 truncate font-medium text-gray-800">{item.name}</p>
-                <p className="text-xs text-gray-400">
-                  {new Date(item.createTime).toLocaleDateString()}
-                </p>
-                {item.price !== undefined && (
-                  <p className={`text-sm font-bold ${primaryText}`}>¥{item.price}</p>
-                )}
+                <div className="px-3 pt-2 pb-3">
+                  <p className="text-sm font-medium leading-tight text-gray-900">{item.name}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-400">{formatDate(item.created_at)}</span>
+                    {item.price && <span className="text-xs font-medium" style={{ color: colors.primary }}>¥{item.price}</span>}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
-      </main>
+      </div>
 
-      <Modal
-        open={modalOpen}
-        title={editingItem ? '编辑物品' : '新建物品'}
-        onClose={() => setModalOpen(false)}
-        footer={
-          <>
-            <button
-              onClick={() => setModalOpen(false)}
-              className="flex-1 rounded-xl border border-gray-200 bg-white py-3 text-sm font-medium text-gray-600"
-            >
-              取消
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={!form.name.trim() || !form.imageUrl}
-              className={`flex-1 py-3 text-sm font-semibold text-white disabled:opacity-50 ${primaryBg} ${radius}`}
-            >
-              确认
-            </button>
-          </>
-        }
+      {/* FAB */}
+      <button
+        onClick={() => navigate(`/items/new/${categoryId}`)}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center z-30 transition-transform duration-200 active:scale-95 border-none"
+        style={{
+          background: colors.primary,
+          color: colors.textOnPrimary,
+          boxShadow: `0 8px 24px -4px ${theme === 'GRAY' ? 'rgba(59,89,152,0.45)' : 'rgba(232,160,191,0.45)'}`,
+        }}
       >
-        <div className="space-y-4">
-          <ImageUploader
-            value={form.imageUrl}
-            onChange={(url) => setForm({ ...form, imageUrl: url })}
-            className="mx-auto h-32 w-32 rounded-2xl"
-          />
-          <input
-            type="text"
-            placeholder="物品名称（必填）"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-gray-400"
-          />
-          <input
-            type="number"
-            placeholder="价格（选填）"
-            value={form.price}
-            onChange={(e) => setForm({ ...form, price: e.target.value })}
-            className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-gray-400"
-          />
-        </div>
-      </Modal>
-
-      <BottomNav />
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
     </div>
   );
 }

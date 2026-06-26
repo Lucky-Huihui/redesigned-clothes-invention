@@ -1,253 +1,112 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Heart, Star, ThumbsDown, ArrowLeft, Loader2 } from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { addOutfit, updateOutfitImage } from '@/store/slices/outfitSlice';
-import { setReaction } from '@/store/slices/reactionSlice';
-import { clearDraft } from '@/store/slices/outfitDraftSlice';
-import Toast from '@/components/Toast';
-import BottomNav from '@/components/BottomNav';
-import type { ReactionType } from '@/types';
-
-async function generateOutfitImage(
-  itemUrls: string[],
-  gender: string,
-  theme: 'PINK' | 'GRAY'
-): Promise<string> {
-  const canvas = document.createElement('canvas');
-  canvas.width = 600;
-  canvas.height = 800;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return '';
-
-  // Background
-  const gradient = ctx.createLinearGradient(0, 0, 0, 800);
-  if (theme === 'PINK') {
-    gradient.addColorStop(0, '#FFF5F7');
-    gradient.addColorStop(1, '#FFE4E9');
-  } else {
-    gradient.addColorStop(0, '#F8F9FA');
-    gradient.addColorStop(1, '#E2E6EA');
-  }
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Title
-  ctx.fillStyle = theme === 'PINK' ? '#FF6B81' : '#2C3E50';
-  ctx.font = 'bold 36px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('AI 试穿效果', 300, 70);
-  ctx.font = '24px sans-serif';
-  ctx.fillText(`模特性别：${gender === 'MALE' ? '男' : '女'}`, 300, 110);
-
-  // Model silhouette placeholder
-  ctx.fillStyle = '#E5E7EB';
-  ctx.beginPath();
-  ctx.ellipse(300, 280, 50, 55, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillRect(250, 335, 100, 160);
-  ctx.fillRect(230, 340, 40, 110);
-  ctx.fillRect(330, 340, 40, 110);
-  ctx.fillRect(255, 495, 35, 130);
-  ctx.fillRect(310, 495, 35, 130);
-
-  // Draw selected items
-  const images = await Promise.all(
-    itemUrls.map(
-      (url) =>
-        new Promise<HTMLImageElement>((resolve) => {
-          const img = new Image();
-          img.crossOrigin = 'anonymous';
-          img.onload = () => resolve(img);
-          img.onerror = () => resolve(img);
-          img.src = url;
-        })
-    )
-  );
-
-  const positions = [
-    { x: 60, y: 180, w: 160, h: 160 },
-    { x: 380, y: 180, w: 160, h: 160 },
-    { x: 60, y: 400, w: 160, h: 160 },
-    { x: 380, y: 400, w: 160, h: 160 },
-  ];
-
-  images.forEach((img, index) => {
-    if (!img.complete || !img.naturalWidth) return;
-    const pos = positions[index % positions.length];
-    ctx.save();
-    ctx.beginPath();
-    ctx.roundRect(pos.x, pos.y, pos.w, pos.h, 16);
-    ctx.clip();
-    ctx.drawImage(img, pos.x, pos.y, pos.w, pos.h);
-    ctx.restore();
-
-    ctx.strokeStyle = theme === 'PINK' ? '#FF6B81' : '#2C3E50';
-    ctx.lineWidth = 3;
-    ctx.strokeRect(pos.x, pos.y, pos.w, pos.h);
-  });
-
-  ctx.fillStyle = '#9CA3AF';
-  ctx.font = '18px sans-serif';
-  ctx.fillText('本图为前端模拟生成，仅供演示', 300, 760);
-
-  return canvas.toDataURL('image/png');
-}
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { setOutfitFeedback } from '@/api/outfits';
+import { useAppSelector } from '@/store';
+import { getThemeColors } from '@/utils/theme';
+import type { AppOutfit } from '@/types';
 
 export default function OutfitResult() {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const userId = useAppSelector((s) => s.auth.currentUserId);
-  const currentUser = useAppSelector((s) =>
-    s.auth.users.find((u) => u.userId === s.auth.currentUserId)
-  );
+  const location = useLocation();
   const theme = useAppSelector((s) => s.theme.theme);
-  const selections = useAppSelector((s) => s.outfitDraft.selections);
-  const items = useAppSelector((s) => s.items.items);
-  const outfits = useAppSelector((s) => s.outfits.outfits);
-  const reactions = useAppSelector((s) => s.reactions.reactions);
+  const colors = getThemeColors(theme);
+  const outfit = (location.state as any)?.outfit as AppOutfit;
+  const [feedback, setFeedback] = useState<string | null>(outfit?.feedback || null);
 
-  const [loading, setLoading] = useState(true);
-  const [outfitId, setOutfitId] = useState<string | null>(null);
-  const [toast, setToast] = useState('');
-  const generatedRef = useRef(false);
+  if (!outfit) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif" }}>
+        <div className="text-center">
+          <p className="text-gray-400 mb-4">未找到搭配数据</p>
+          <button onClick={() => navigate('/outfits')} className="px-6 py-2 rounded-full text-white" style={{ background: colors.primary }}>
+            返回搭配
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  const selectedItemIds = Object.values(selections);
-  const selectedItems = selectedItemIds
-    .map((id) => items.find((i) => i.itemId === id))
-    .filter(Boolean) as typeof items;
-
-  useEffect(() => {
-    if (selectedItemIds.length === 0) {
-      navigate('/outfits');
-      return;
+  const handleFeedback = async (type: string) => {
+    try {
+      await setOutfitFeedback(outfit.id, type);
+      setFeedback(type);
+    } catch (err: any) {
+      alert(err.message);
     }
-    if (generatedRef.current || !userId) return;
-    generatedRef.current = true;
-
-    const outfit = {
-      userId,
-      items: selectedItemIds,
-    };
-    dispatch(addOutfit(outfit));
-
-    // Read newly created outfit id from store
-    const newOutfit = outfits[outfits.length - 1];
-    const targetId = newOutfit?.outfitId;
-    if (!targetId) return;
-    setOutfitId(targetId);
-
-    generateOutfitImage(
-      selectedItems.map((i) => i.imageUrl),
-      currentUser?.gender || 'FEMALE',
-      theme
-    ).then((url) => {
-      dispatch(updateOutfitImage({ outfitId: targetId, resultImageUrl: url }));
-      setLoading(false);
-    });
-  }, [dispatch, navigate, selectedItemIds, selectedItems, currentUser, theme, outfits, userId]);
-
-  const currentReaction = useAppSelector((s) =>
-    outfitId
-      ? s.reactions.reactions.find(
-          (r) => r.userId === userId && r.outfitId === outfitId
-        )?.type
-      : undefined
-  );
-
-  const handleReaction = (type: ReactionType) => {
-    if (!userId || !outfitId) return;
-    dispatch(setReaction({ userId, outfitId, type }));
-    const labels: Record<ReactionType, string> = {
-      LIKE: '已标记喜欢',
-      FAVORITE: '已收藏',
-      DISLIKE: '已标记不喜欢',
-    };
-    setToast(labels[type]);
   };
 
-  const resultUrl = outfits.find((o) => o.outfitId === outfitId)?.resultImageUrl;
-
-  const bg = theme === 'PINK' ? 'bg-[#FFF5F7]' : 'bg-[#F8F9FA]';
-  const primaryText = theme === 'PINK' ? 'text-[#FF6B81]' : 'text-[#2C3E50]';
-  const primaryBg = theme === 'PINK' ? 'bg-[#FF6B81]' : 'bg-[#2C3E50]';
-  const radius = theme === 'PINK' ? 'rounded-3xl' : 'rounded-xl';
-
   return (
-    <div className={`min-h-screen pb-24 ${bg}`}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 bg-white/90 px-5 py-4 backdrop-blur">
-        <button onClick={() => navigate('/outfits')} className={primaryText}>
-          <ArrowLeft size={24} />
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto', background: colors.bg }}>
+      {/* Top Nav */}
+      <nav className="sticky top-0 z-20 flex items-center justify-center h-14 px-4 border-b bg-white"
+        style={{ borderColor: colors.borderLight }}>
+        <button onClick={() => navigate('/outfits')} className="absolute left-4 bg-none border-none cursor-pointer p-2 text-gray-900">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M15 19l-7-7 7-7"/></svg>
         </button>
-        <h1 className={`text-lg font-bold ${primaryText}`}>试穿结果</h1>
-      </header>
+        <span className="text-lg font-semibold text-gray-900 tracking-tight">试穿效果</span>
+        <button className="absolute right-4 bg-none border-none cursor-pointer p-2 text-gray-900">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+          </svg>
+        </button>
+      </nav>
 
-      <main className="mx-auto flex max-w-md flex-col items-center px-4 pt-6">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className={`animate-spin ${primaryText}`} size={48} />
-            <p className={`mt-4 font-medium ${primaryText}`}>AI 正在生成搭配效果...</p>
-          </div>
+      {/* Main Display */}
+      <div className="mx-4 mt-4 rounded-xl overflow-hidden relative" style={{ aspectRatio: '3/4', background: colors.bgSecondary }}>
+        {outfit.result_image ? (
+          <img src={outfit.result_image} alt="试穿效果" className="w-full h-full object-cover" />
         ) : (
-          <>
-            <div
-              className={`relative w-full overflow-hidden bg-white shadow-xl ${radius}`}
-              style={{ aspectRatio: '3/4' }}
-            >
-              {resultUrl ? (
-                <img
-                  src={resultUrl}
-                  alt="AI 试穿效果"
-                  className="h-full w-full object-contain"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-gray-400">
-                  生成失败，请重试
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 flex w-full justify-around">
-              {([
-                { type: 'LIKE' as ReactionType, icon: Heart, label: '喜欢' },
-                { type: 'FAVORITE' as ReactionType, icon: Star, label: '收藏' },
-                { type: 'DISLIKE' as ReactionType, icon: ThumbsDown, label: '不喜欢' },
-              ]).map(({ type, icon: Icon, label }) => {
-                const active = currentReaction === type;
-                return (
-                  <button
-                    key={type}
-                    onClick={() => handleReaction(type)}
-                    className={`flex flex-col items-center gap-2 rounded-2xl px-6 py-3 transition-transform active:scale-95 ${
-                      active
-                        ? `${primaryBg} text-white shadow-md`
-                        : 'bg-white text-gray-600 shadow-sm'
-                    }`}
-                  >
-                    <Icon size={24} className={active ? 'fill-current' : ''} />
-                    <span className="text-xs font-medium">{label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => {
-                dispatch(clearDraft());
-                navigate('/outfits');
-              }}
-              className={`mt-6 w-full py-3 font-semibold text-white shadow-md transition-transform active:scale-95 ${primaryBg} ${
-                theme === 'PINK' ? 'rounded-2xl' : 'rounded-lg'
-              }`}
-            >
-              再试一套
-            </button>
-          </>
+          <div className="w-full h-full flex items-center justify-center text-gray-400">加载失败</div>
         )}
-      </main>
+        <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md text-white text-[11px] font-medium"
+          style={{ background: theme === 'GRAY' ? 'rgba(59,89,152,0.85)' : 'rgba(232,160,191,0.85)' }}>
+          AI 试穿
+        </div>
+      </div>
 
-      {toast && <Toast message={toast} onClose={() => setToast('')} />}
-      <BottomNav />
+      {/* Feedback Buttons */}
+      <div className="flex gap-2.5 px-4 pt-5">
+        <button onClick={() => handleFeedback('DISLIKE')}
+          className="flex-1 flex items-center justify-center gap-1.5 h-12 rounded-xl border-none cursor-pointer transition-transform active:scale-[0.97] text-sm font-semibold"
+          style={{
+            background: feedback === 'DISLIKE' ? '#EF4444' : colors.bgTertiary,
+            color: feedback === 'DISLIKE' ? '#FFFFFF' : colors.textSecondary,
+          }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          不喜欢
+        </button>
+        <button onClick={() => handleFeedback('FAVORITE')}
+          className="flex-1 flex items-center justify-center gap-1.5 h-12 rounded-xl border-none cursor-pointer transition-transform active:scale-[0.97] text-sm font-semibold"
+          style={{
+            background: feedback === 'FAVORITE' ? '#F59E0B' : colors.primarySubtle,
+            color: feedback === 'FAVORITE' ? '#FFFFFF' : colors.primary,
+          }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          收藏
+        </button>
+        <button onClick={() => handleFeedback('LIKE')}
+          className="flex-1 flex items-center justify-center gap-1.5 h-12 rounded-xl border-none cursor-pointer transition-transform active:scale-[0.97] text-sm font-semibold"
+          style={{
+            background: feedback === 'LIKE' ? colors.primary : colors.primarySubtle,
+            color: feedback === 'LIKE' ? colors.textOnPrimary : colors.primary,
+          }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>
+          喜欢
+        </button>
+      </div>
+
+      {/* Bottom Action */}
+      <div className="px-4 pt-5 pb-10">
+        <button onClick={() => navigate('/outfits')}
+          className="w-full h-12 rounded-xl border-2 flex items-center justify-center gap-2 text-base font-semibold bg-transparent cursor-pointer transition-all active:scale-[0.98]"
+          style={{ borderColor: colors.primary, color: colors.primary }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+          </svg>
+          重新搭配
+        </button>
+      </div>
     </div>
   );
 }

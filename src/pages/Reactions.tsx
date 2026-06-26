@@ -1,90 +1,90 @@
-import { useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, X } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getReactions } from '@/api/outfits';
 import { useAppSelector } from '@/store';
-import type { ReactionType } from '@/types';
+import { getThemeColors, formatDate } from '@/utils/theme';
+import type { ReactionWithOutfit } from '@/api/outfits';
+
+const TYPE_LABELS: Record<string, { label: string; icon: string; color: string }> = {
+  LIKE: { label: '喜欢的搭配', icon: '❤️', color: '#E8A0BF' },
+  FAVORITE: { label: '收藏的搭配', icon: '⭐', color: '#F59E0B' },
+  DISLIKE: { label: '不喜欢的搭配', icon: '👎', color: '#9CA3AF' },
+};
 
 export default function Reactions() {
   const { type } = useParams<{ type: string }>();
-  const userId = useAppSelector((s) => s.auth.currentUserId);
+  const navigate = useNavigate();
   const theme = useAppSelector((s) => s.theme.theme);
-  const outfits = useAppSelector((s) => s.outfits.outfits);
-  const reactions = useAppSelector((s) =>
-    s.reactions.reactions.filter(
-      (r) => r.userId === userId && r.type === (type?.toUpperCase() as ReactionType)
-    )
-  );
+  const colors = getThemeColors(theme);
+  const info = TYPE_LABELS[type || ''] || { label: '搭配记录', icon: '📋', color: colors.primary };
 
-  const [preview, setPreview] = useState<string | null>(null);
+  const [reactions, setReactions] = useState<ReactionWithOutfit[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const data = useMemo(() => {
-    return reactions
-      .map((r) => {
-        const outfit = outfits.find((o) => o.outfitId === r.outfitId);
-        return outfit ? { ...r, outfit } : null;
-      })
-      .filter(Boolean) as (typeof reactions[number] & { outfit: typeof outfits[number] })[];
-  }, [reactions, outfits]);
+  const loadData = useCallback(async () => {
+    try {
+      const data = await getReactions(type!);
+      setReactions(data);
+    } catch (err) {
+      console.error('Failed to load reactions:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [type]);
 
-  const bg = theme === 'PINK' ? 'bg-[#FFF5F7]' : 'bg-[#F8F9FA]';
-  const primaryText = theme === 'PINK' ? 'text-[#FF6B81]' : 'text-[#2C3E50]';
-  const labels: Record<string, string> = {
-    like: '我喜欢的',
-    favorite: '我收藏的',
-    dislike: '我不喜欢的',
-  };
+  useEffect(() => { loadData(); }, [loadData]);
 
   return (
-    <div className={`min-h-screen ${bg}`}>
-      <header className="sticky top-0 z-10 flex items-center gap-3 bg-white/90 px-5 py-4 backdrop-blur">
-        <Link to="/profile" className={primaryText}>
-          <ArrowLeft size={24} />
-        </Link>
-        <h1 className={`text-lg font-bold ${primaryText}`}>{labels[type || 'like']}</h1>
-      </header>
+    <div className="min-h-screen" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto', background: colors.bgSecondary }}>
+      <nav className="sticky top-0 z-20 flex items-center justify-center h-14 px-4 bg-white border-b" style={{ borderColor: colors.borderLight }}>
+        <button onClick={() => navigate('/profile')} className="absolute left-4 w-9 h-9 flex items-center justify-center rounded-lg">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+        </button>
+        <h1 className="text-base font-semibold text-gray-900">{info.icon} {info.label}</h1>
+      </nav>
 
-      <main className="mx-auto max-w-md px-4 pt-4">
-        {data.length === 0 ? (
-          <div className="py-20 text-center text-gray-400">暂无记录</div>
+      {/* Tab bar */}
+      <div className="flex bg-white border-b" style={{ borderColor: colors.borderLight }}>
+        {Object.entries(TYPE_LABELS).map(([key, val]) => (
+          <button key={key} onClick={() => navigate(`/profile/reactions/${key}`)}
+            className="flex-1 py-3 text-sm font-medium border-b-2 transition-colors"
+            style={{
+              color: type === key ? val.color : colors.textTertiary,
+              borderBottomColor: type === key ? val.color : 'transparent',
+            }}>
+            {val.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Grid */}
+      <div className="px-3 pt-4 pb-8">
+        {loading ? (
+          <div className="text-center py-12 text-gray-400">加载中...</div>
+        ) : reactions.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-5xl mb-3">📭</div>
+            <p className="text-sm text-gray-400">暂无{info.label}</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            {data.map(({ outfit }) => (
-              <button
-                key={outfit.outfitId}
-                onClick={() => outfit.resultImageUrl && setPreview(outfit.resultImageUrl)}
-                className="overflow-hidden rounded-2xl bg-white shadow-sm"
-              >
-                {outfit.resultImageUrl ? (
-                  <img
-                    src={outfit.resultImageUrl}
-                    alt="outfit"
-                    className="h-48 w-full object-cover"
-                  />
+          <div className="grid grid-cols-2 gap-3">
+            {reactions.map(r => (
+              <div key={r.id} className="rounded-xl overflow-hidden" style={{ background: colors.bg, boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                {r.outfit.result_image ? (
+                  <img src={r.outfit.result_image} alt="搭配" className="w-full object-cover" style={{ aspectRatio: '3/4', background: colors.primaryBg }} />
                 ) : (
-                  <div className="flex h-48 items-center justify-center text-gray-400">
-                    无效果图
+                  <div className="w-full flex items-center justify-center text-3xl" style={{ aspectRatio: '3/4', background: colors.primaryBg }}>
+                    👗
                   </div>
                 )}
-                <p className="p-2 text-xs text-gray-500">
-                  {new Date(outfit.createTime).toLocaleString()}
-                </p>
-              </button>
+                <div className="px-3 py-2">
+                  <p className="text-xs text-gray-400">{formatDate(r.outfit.created_at)}</p>
+                </div>
+              </div>
             ))}
           </div>
         )}
-      </main>
-
-      {preview && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-          onClick={() => setPreview(null)}
-        >
-          <button className="absolute right-4 top-4 rounded-full bg-white/20 p-2 text-white">
-            <X size={24} />
-          </button>
-          <img src={preview} alt="preview" className="max-h-full max-w-full rounded-xl" />
-        </div>
-      )}
+      </div>
     </div>
   );
 }
