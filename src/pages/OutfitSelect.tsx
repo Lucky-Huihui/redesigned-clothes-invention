@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories } from '@/api/categories';
 import { getItems } from '@/api/items';
-import { createOutfit } from '@/api/outfits';
+import { createOutfit, tryOnAI } from '@/api/outfits';
 import { useAppSelector } from '@/store';
 import BottomNav from '@/components/BottomNav';
 import { getThemeColors } from '@/utils/theme';
@@ -90,43 +90,24 @@ export default function OutfitSelect() {
     setSaving(true);
     try {
       const itemIds = Object.values(selections);
-      const canvas = document.createElement('canvas');
-      canvas.width = 400;
-      canvas.height = 560;
-      const ctx = canvas.getContext('2d')!;
 
-      const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-      grad.addColorStop(0, theme === 'GRAY' ? '#EFF3FA' : '#FDF2F8');
-      grad.addColorStop(1, theme === 'GRAY' ? '#E8EDF5' : '#FCEEF5');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.strokeStyle = theme === 'GRAY' ? '#3B5998' : '#E8A0BF';
-      ctx.lineWidth = 2;
-      ctx.fillStyle = theme === 'GRAY' ? 'rgba(59,89,152,0.1)' : 'rgba(232,160,191,0.1)';
-      ctx.beginPath(); ctx.ellipse(200, 80, 32, 38, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(200, 118); ctx.lineTo(200, 320); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(140, 140); ctx.lineTo(260, 140); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(140, 140); ctx.lineTo(110, 260); ctx.moveTo(260, 140); ctx.lineTo(290, 260); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(200, 320); ctx.lineTo(170, 460); ctx.moveTo(200, 320); ctx.lineTo(230, 460); ctx.stroke();
-
-      ctx.fillStyle = theme === 'GRAY' ? '#3B5998' : '#B76E79';
-      ctx.font = 'bold 14px "Noto Sans SC", sans-serif';
-      ctx.textAlign = 'center';
-      let y = 400;
-      for (const itemId of itemIds) {
-        const allIt = Object.values(items).flat();
+      // 收集选中物品详情发给后端 AI 试穿
+      const allIt = Object.values(items).flat();
+      const selectedItems = Object.entries(selections).map(([catId, itemId]) => {
         const it = allIt.find(i => i.id === itemId);
-        if (it) { ctx.fillText(it.name, 200, y); y += 22; }
-      }
-      ctx.fillStyle = theme === 'GRAY' ? 'rgba(59,89,152,0.4)' : 'rgba(232,160,191,0.4)';
-      ctx.font = '12px "Noto Sans SC", sans-serif';
-      ctx.fillText('AI 试穿模拟效果', 200, 500);
-      ctx.fillText('本图为前端模拟生成，仅供演示', 200, 520);
+        const cat = categories.find(c => c.id === catId);
+        return { id: itemId, name: it?.name || '', image: it?.image || '', catName: cat?.name || '' };
+      });
 
-      const resultImage = canvas.toDataURL('image/jpeg', 0.8);
-      const outfit = await createOutfit(itemIds, resultImage);
-      navigate('/outfits/result', { state: { outfit } });
+      const tryOnResult = await tryOnAI(selectedItems, theme);
+      const outfit = await createOutfit(itemIds, tryOnResult.image);
+      navigate('/outfits/result', {
+        state: {
+          outfit: { ...outfit, result_image: tryOnResult.image },
+          tryOnMode: tryOnResult.mode,
+          tryOnMessage: tryOnResult.message,
+        },
+      });
     } catch (err: any) {
       alert(err.message || '试穿失败');
     } finally {

@@ -20,6 +20,12 @@ export interface ReactionWithOutfit {
   };
 }
 
+export interface TryOnResult {
+  image: string;
+  mode: 'ai' | 'demo';
+  message: string;
+}
+
 export async function getOutfits() {
   return api('/outfits') as Promise<Outfit[]>;
 }
@@ -45,4 +51,11 @@ export async function getReactionCounts() {
 
 export async function deleteOutfit(id: string) {
   return api(`/outfits/${id}`, { method: 'DELETE' });
+}
+
+export async function tryOnAI(items: Array<{ id: string; name: string; image: string; catName: string }>, theme: string) {
+  return api('/tryon/try-on', {
+    method: 'POST',
+    body: { items, theme },
+  }) as Promise<TryOnResult>;
 }

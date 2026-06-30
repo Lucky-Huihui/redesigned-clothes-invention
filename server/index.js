@@ -6,6 +6,7 @@ import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/categories.js';
 import itemRoutes from './routes/items.js';
 import outfitRoutes from './routes/outfits.js';
+import tryonRoutes from './routes/tryon.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/outfits', outfitRoutes);
+app.use('/api/tryon', tryonRoutes);
 
 // API 404 fallback
 app.use('/api/*', (req, res) => {
