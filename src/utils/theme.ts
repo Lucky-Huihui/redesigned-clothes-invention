@@ -2,28 +2,32 @@ import { getToken } from '@/api/client';
 import type { Theme } from '@/types';
 
 export function getThemeColors(theme: Theme) {
-  const isMale = theme === 'GRAY';
+  const isBlue = theme === 'BLUE';
   return {
-    primary: isMale ? '#3B5998' : '#E8A0BF',
-    primaryHover: isMale ? '#2D4373' : '#D98AAE',
-    primaryLight: isMale ? '#C5D3E8' : '#F5D5E5',
-    primaryBg: isMale ? '#EFF3FA' : '#FDF2F8',
-    primarySubtle: isMale ? '#E8EDF5' : '#FCEEF5',
-    accent: isMale ? '#F59E0B' : '#B76E79',
-    accentLight: isMale ? '#FCD34D' : '#D4A0A7',
+    primary: isBlue ? '#3B5998' : '#E8A0BF',
+    primaryHover: isBlue ? '#2D4373' : '#D98AAE',
+    primaryLight: isBlue ? '#C5D3E8' : '#F5D5E5',
+    primaryBg: isBlue ? '#EFF3FA' : '#FDF2F8',
+    primarySubtle: isBlue ? '#E8EDF5' : '#FCEEF5',
+    accent: isBlue ? '#F59E0B' : '#B76E79',
+    accentLight: isBlue ? '#FCD34D' : '#D4A0A7',
     bg: '#FFFFFF',
-    bgSecondary: isMale ? '#F8FAFC' : '#F9FAFB',
-    bgTertiary: isMale ? '#F1F5F9' : '#F3F4F6',
-    border: isMale ? '#E2E8F0' : '#E5E7EB',
-    borderLight: isMale ? '#F1F5F9' : '#F3F4F6',
+    bgSecondary: isBlue ? '#F8FAFC' : '#F9FAFB',
+    bgTertiary: isBlue ? '#F1F5F9' : '#F3F4F6',
+    border: isBlue ? '#E2E8F0' : '#E5E7EB',
+    borderLight: isBlue ? '#F1F5F9' : '#F3F4F6',
     textPrimary: '#111827',
     textSecondary: '#6B7280',
     textTertiary: '#9CA3AF',
     textOnPrimary: '#FFFFFF',
-    radiusMd: isMale ? '6px' : '8px',
-    radiusLg: isMale ? '10px' : '12px',
-    radiusXl: isMale ? '14px' : '16px',
+    radiusMd: isBlue ? '6px' : '8px',
+    radiusLg: isBlue ? '10px' : '12px',
+    radiusXl: isBlue ? '14px' : '16px',
   };
+}
+
+export function themeDataAttr(theme: Theme): 'light' | 'male' {
+  return theme === 'BLUE' ? 'male' : 'light';
 }
 
 export function getTokenHeader() {

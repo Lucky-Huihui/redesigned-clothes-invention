@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/store';
 import { updateUser, logout } from '@/store/slices/authSlice';
 import { updateProfile, changePassword, deleteAccount } from '@/api/auth';
-import { getThemeColors } from '@/utils/theme';
+import { getErrorMessage } from '@/utils/error';
+import { cn } from '@/lib/utils';
 
 export default function EditProfile() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((s) => s.auth.user);
-  const theme = useAppSelector((s) => s.theme.theme);
-  const colors = getThemeColors(theme);
 
   const [nickname, setNickname] = useState(user?.nickname || '');
   const [gender, setGender] = useState<'MALE' | 'FEMALE'>(user?.gender || 'FEMALE');
@@ -27,8 +27,8 @@ export default function EditProfile() {
       const updated = await updateProfile({ nickname: nickname.trim(), gender });
       dispatch(updateUser(updated));
       setMessage('资料已更新');
-    } catch (err: any) {
-      setMessage(err.message);
+    } catch (err) {
+      setMessage(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -42,8 +42,8 @@ export default function EditProfile() {
       await changePassword(oldPassword, newPassword);
       setOldPassword(''); setNewPassword(''); setShowPassword(false);
       setMessage('密码修改成功');
-    } catch (err: any) {
-      setMessage(err.message);
+    } catch (err) {
+      setMessage(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -57,84 +57,124 @@ export default function EditProfile() {
       await deleteAccount();
       dispatch(logout());
       navigate('/login');
-    } catch (err: any) {
-      setMessage(err.message);
+    } catch (err) {
+      setMessage(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto', background: colors.bgSecondary }}>
-      <nav className="sticky top-0 z-20 flex items-center justify-center h-14 px-4 bg-white border-b" style={{ borderColor: colors.borderLight }}>
-        <button onClick={() => navigate('/profile')} className="absolute left-4 w-9 h-9 flex items-center justify-center rounded-lg">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5m7-7-7 7 7 7"/></svg>
+    <div className="app-shell">
+      <nav className="sticky top-0 z-sticky flex items-center justify-center h-14 px-4 bg-surface border-b border-border-light safe-top">
+        <button onClick={() => navigate('/profile')} className="absolute left-4 w-9 h-9 flex items-center justify-center rounded-lg text-ink">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5m7-7-7 7 7 7"/>
+          </svg>
         </button>
-        <h1 className="text-base font-semibold text-gray-900">编辑资料</h1>
+        <h1 className="text-base font-semibold text-ink">编辑资料</h1>
       </nav>
 
       {message && (
-        <div className={`mx-4 mt-4 p-3 rounded-lg text-sm ${message.includes('成功') || message.includes('已更新') ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>
+        <div className={cn(
+          'mx-4 mt-4 p-3 rounded-lg text-sm animate-fade-in',
+          message.includes('成功') || message.includes('已更新') ? 'bg-success/10 text-success' : 'bg-error/10 text-error'
+        )}>
           {message}
         </div>
       )}
 
       {/* Profile Form */}
-      <section className="mx-4 mt-4 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
+      <section className="card mx-4 mt-4 p-4">
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-500 mb-1.5">昵称</label>
-          <input type="text" value={nickname} onChange={e => setNickname(e.target.value)}
-            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+          <label className="form-label">昵称</label>
+          <input
+            type="text"
+            value={nickname}
+            onChange={e => setNickname(e.target.value)}
+            className="form-input"
+          />
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-500 mb-2">性别</label>
+          <label className="form-label">性别</label>
           <div className="flex gap-2.5">
-            <button onClick={() => setGender('FEMALE')}
-              className="flex-1 h-11 rounded-lg text-sm font-medium transition-all"
-              style={{
-                background: gender === 'FEMALE' ? colors.primary : colors.bgTertiary,
-                color: gender === 'FEMALE' ? colors.textOnPrimary : colors.textSecondary,
-                border: gender === 'FEMALE' ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`,
-              }}>女</button>
-            <button onClick={() => setGender('MALE')}
-              className="flex-1 h-11 rounded-lg text-sm font-medium transition-all"
-              style={{
-                background: gender === 'MALE' ? colors.primary : colors.bgTertiary,
-                color: gender === 'MALE' ? colors.textOnPrimary : colors.textSecondary,
-                border: gender === 'MALE' ? `1px solid ${colors.primary}` : `1px solid ${colors.border}`,
-              }}>男</button>
+            <button
+              type="button"
+              onClick={() => setGender('FEMALE')}
+              className={cn(
+                'flex-1 h-11 rounded-lg text-sm font-medium transition-all border',
+                gender === 'FEMALE'
+                  ? 'bg-primary text-brand-ink border-primary'
+                  : 'bg-bg-secondary text-ink-2 border-border'
+              )}
+            >
+              女
+            </button>
+            <button
+              type="button"
+              onClick={() => setGender('MALE')}
+              className={cn(
+                'flex-1 h-11 rounded-lg text-sm font-medium transition-all border',
+                gender === 'MALE'
+                  ? 'bg-primary text-brand-ink border-primary'
+                  : 'bg-bg-secondary text-ink-2 border-border'
+              )}
+            >
+              男
+            </button>
           </div>
         </div>
-        <button onClick={handleSaveProfile} disabled={loading}
-          className="w-full h-11 rounded-full text-white text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-50"
-          style={{ background: colors.primary }}>保存资料</button>
+        <button onClick={handleSaveProfile} disabled={loading} className="btn-primary">
+          {loading ? '保存中...' : '保存资料'}
+        </button>
       </section>
 
       {/* Password Form */}
-      <section className="mx-4 mt-4 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
-        <h2 className="text-sm font-semibold text-gray-900 mb-4">修改密码</h2>
+      <section className="card mx-4 mt-4 p-4">
+        <h2 className="text-sm font-semibold text-ink mb-4">修改密码</h2>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-500 mb-1.5">原密码</label>
-          <input type={showPassword ? 'text' : 'password'} value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="请输入原密码"
-            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+          <label className="form-label">原密码</label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={oldPassword}
+              onChange={e => setOldPassword(e.target.value)}
+              placeholder="请输入原密码"
+              className="form-input pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(v => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-3"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
         </div>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-500 mb-1.5">新密码</label>
-          <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="请输入新密码（至少6位）"
-            className="w-full h-11 px-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:border-[#E8A0BF] transition-all" />
+          <label className="form-label">新密码</label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="请输入新密码（至少6位）"
+              className="form-input pr-10"
+            />
+          </div>
         </div>
-        <button onClick={handleChangePassword} disabled={loading}
-          className="w-full h-11 rounded-full text-sm font-semibold transition-transform active:scale-[0.98] disabled:opacity-50"
-          style={{ background: colors.primary, color: colors.textOnPrimary }}>修改密码</button>
+        <button onClick={handleChangePassword} disabled={loading} className="btn-primary">
+          {loading ? '修改中...' : '修改密码'}
+        </button>
       </section>
 
       {/* Delete Account */}
-      <section className="mx-4 mt-4 mb-8 p-4 bg-white rounded-xl" style={{ border: `1px solid ${colors.borderLight}` }}>
+      <section className="card mx-4 mt-4 mb-8 p-4">
         <button onClick={handleDeleteAccount} disabled={loading}
-          className="w-full h-11 rounded-full border-2 border-red-300 text-red-400 text-sm font-semibold active:bg-red-50 transition-colors disabled:opacity-50">
+          className="w-full h-11 rounded-full border-2 border-error/50 text-error text-sm font-semibold active:bg-error/5 transition-colors disabled:opacity-50">
           注销账号
         </button>
-        <p className="text-xs text-gray-400 text-center mt-2">注销后所有数据将被永久删除且无法恢复</p>
+        <p className="text-xs text-ink-3 text-center mt-2">注销后所有数据将被永久删除且无法恢复</p>
       </section>
     </div>
   );

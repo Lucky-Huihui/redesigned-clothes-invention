@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI试穿 - 衣橱搭配</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+  <div class="mobile-container">
+    <!-- Navigation Bar -->
+    <nav class="nav-bar">
+      <button data-dom-id="back-outfit" class="nav-icon" aria-label="返回">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      </button>
+      <h1 class="nav-title">试穿效果</h1>
+      <button class="nav-icon" aria-label="分享">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      </button>
+    </nav>
+
+    <!-- Main Display Area -->
+    <main class="main-display">
+      <img src="../assets/image_0_yi19x4.jpg" alt="AI试穿效果展示" class="tryon-image">
+      <div class="gradient-overlay"></div>
+    </main>
+
+    <!-- Outfit Summary Strip -->
+    <section class="outfit-summary">
+      <div class="outfit-scroll">
+        <div class="outfit-item">
+          <div class="outfit-thumb">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8A0BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg>
+          </div>
+          <span class="outfit-name">白色衬衫</span>
+        </div>
+        <div class="outfit-item">
+          <div class="outfit-thumb">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8A0BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+          </div>
+          <span class="outfit-name">牛仔裤</span>
+        </div>
+        <div class="outfit-item">
+          <div class="outfit-thumb">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#E8A0BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17l-2 2-2-2"/><path d="M15 17V5a2 2 0 012-2h2a2 2 0 012 2v12"/><path d="M5 17l2 2 2-2"/><path d="M9 17V5a2 2 0 00-2-2H5a2 2 0 00-2 2v12"/></svg>
+          </div>
+          <span class="outfit-name">小白鞋</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feedback Buttons -->
+    <section class="feedback-section">
+      <div class="feedback-buttons">
+        <button class="feedback-btn dislike" aria-label="不喜欢">
+          <svg class="feedback-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 01-1.92-2.56l2.33-8A2 2 0 016.5 2H20a2 2 0 012 2v8a2 2 0 01-2 2h-2.76a2 2 0 00-1.79 1.11L12 22h0a3.13 3.13 0 01-3-3.88z"/></svg>
+          <span class="feedback-text">不喜欢</span>
+        </button>
+        <button class="feedback-btn favorite" aria-label="收藏">
+          <svg class="feedback-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <span class="feedback-text">收藏</span>
+        </button>
+        <button class="feedback-btn like" aria-label="喜欢">
+          <svg class="feedback-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>
+          <span class="feedback-text">喜欢</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Bottom Action -->
+    <section class="action-section">
+      <button class="action-btn" aria-label="重新搭配">
+        <svg class="action-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 00-9-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 009 9 9.75 9.75 0 006.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+        重新搭配
+      </button>
+    </section>
+  </div>
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap');
+    :root {
+      --brand: #E8A0BF;
+      --brand-ink: #FFFFFF;
+      --bg: #FFFFFF;
+      --surface: #FFFFFF;
+      --surface-2: #F9FAFB;
+      --ink: #111827;
+      --ink-2: #6B7280;
+      --ink-3: #9CA3AF;
+      --line: #E5E7EB;
+      --r-md: 12px;
+      --shadow-1: 0 1px 2px rgba(15,23,42,.05), 0 1px 1px rgba(15,23,42,.03);
+    }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background-color: var(--bg);
+      color: var(--ink);
+    }
+    .mobile-container {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--bg);
+      position: relative;
+      overflow-x: hidden;
+    }
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: center;
+      flex: 1;
+    }
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--ink);
+      cursor: pointer;
+      transition: color 150ms ease;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+    .nav-icon:hover { color: var(--brand); }
+    .main-display {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 400px;
+      background-color: var(--surface-2);
+      overflow: hidden;
+    }
+    .tryon-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: var(--r-md);
+    }
+    .gradient-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+      pointer-events: none;
+    }
+    .outfit-summary {
+      padding: 16px;
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .outfit-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      scrollbar-width: none;
+    }
+    .outfit-scroll::-webkit-scrollbar { display: none; }
+    .outfit-item {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .outfit-thumb {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      background-color: var(--surface-2);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .outfit-name {
+      font-size: 12px;
+      color: var(--ink-2);
+      text-align: center;
+      max-width: 70px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .feedback-section {
+      padding: 16px;
+      background-color: var(--surface);
+    }
+    .feedback-buttons {
+      display: flex;
+      gap: 12px;
+    }
+    .feedback-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 8px;
+      border-radius: var(--r-md);
+      border: none;
+      cursor: pointer;
+      transition: transform 150ms ease;
+    }
+    .feedback-btn.dislike { background-color: var(--surface-2); }
+    .feedback-btn.favorite { background-color: #FCEEF5; }
+    .feedback-btn.like { background-color: var(--brand); }
+    .feedback-btn:hover { transform: translateY(-2px); }
+    .feedback-btn:active { transform: translateY(0); }
+    .feedback-icon { width: 20px; height: 20px; }
+    .feedback-btn.dislike .feedback-icon,
+    .feedback-btn.dislike .feedback-text { color: var(--ink-2); }
+    .feedback-btn.favorite .feedback-icon,
+    .feedback-btn.favorite .feedback-text { color: var(--brand); }
+    .feedback-btn.like .feedback-icon,
+    .feedback-btn.like .feedback-text { color: var(--brand-ink); }
+    .feedback-text { font-size: 13px; font-weight: 500; }
+    .action-section {
+      padding: 0 16px 24px;
+      background-color: var(--surface);
+    }
+    .action-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border: 2px solid var(--brand);
+      border-radius: var(--r-md);
+      background-color: transparent;
+      color: var(--brand);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 150ms ease;
+    }
+    .action-btn:hover {
+      background-color: var(--brand);
+      color: var(--brand-ink);
+    }
+    .action-btn:active { transform: scale(0.98); }
+    .action-icon { width: 18px; height: 18px; }
+  </style>
+</body>
+</html>

@@ -1,26 +1,48 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { SlidersHorizontal } from 'lucide-react';
 import { getCategories } from '@/api/categories';
 import { getItems } from '@/api/items';
 import { createOutfit, tryOnAI } from '@/api/outfits';
 import { useAppSelector } from '@/store';
 import BottomNav from '@/components/BottomNav';
-import { getThemeColors } from '@/utils/theme';
+import { getErrorMessage } from '@/utils/error';
+import { cn } from '@/lib/utils';
 import type { AppCategory, AppItem } from '@/types';
 
-// 上衣类：上装 or 连衣裙可以充当"上装"
+// 上装类：上装 or 连衣裙可以充当"上装"
 const TOP_CATS = ['上装', '连衣裙'];
 // 下装类：下装 or 连衣裙可以充当"下装"
 const BOTTOM_CATS = ['下装', '连衣裙'];
 const SHOE_CATS = ['鞋子'];
 
-// 优先展示的分类
-const PRIMARY_CATS = ['上装', '下装', '连衣裙', '外套', '鞋子'];
+const CAT_ICONS: Record<string, string> = {
+  上装: '👕',
+  下装: '👖',
+  连衣裙: '👗',
+  袜子: '🧦',
+  鞋子: '👟',
+  发饰: '🎀',
+  耳饰: '💎',
+  外套: '🧥',
+  背包: '👜',
+};
+
+const CheckIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
+
+const SmallCheckIcon = ({ className }: { className?: string }) => (
+  <svg className={className} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
 
 export default function OutfitSelect() {
   const navigate = useNavigate();
   const theme = useAppSelector((s) => s.theme.theme);
-  const colors = getThemeColors(theme);
 
   const [categories, setCategories] = useState<AppCategory[]>([]);
   const [items, setItems] = useState<Record<string, AppItem[]>>({});
@@ -28,17 +50,20 @@ export default function OutfitSelect() {
   const [selections, setSelections] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+  const [filterQuery, setFilterQuery] = useState('');
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const loadData = useCallback(async () => {
     try {
       const cats = await getCategories();
-      setCategories(cats);
       const allItems = await getItems();
       const grouped: Record<string, AppItem[]> = {};
       for (const cat of cats) {
-        grouped[cat.id] = allItems.filter(i => i.category_id === cat.id);
+        grouped[cat.id] = allItems.filter((i) => i.category_id === cat.id);
       }
+      setCategories(cats);
       setItems(grouped);
       if (cats.length > 0) setSelectedCat(cats[0].id);
     } catch (err) {
@@ -48,10 +73,19 @@ export default function OutfitSelect() {
     }
   }, []);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  useEffect(() => {
+    const el = tabRefs.current[selectedCat];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }, [selectedCat]);
 
   const selectItem = (catId: string, itemId: string) => {
-    setSelections(prev => {
+    setSelections((prev) => {
       if (prev[catId] === itemId) {
         const next = { ...prev };
         delete next[catId];
@@ -64,275 +98,318 @@ export default function OutfitSelect() {
   const getSelectedItem = (catId: string) => {
     const itemId = selections[catId];
     if (!itemId) return null;
-    const catItems = items[catId] || [];
-    return catItems.find(i => i.id === itemId) || null;
+    return (items[catId] || []).find((i) => i.id === itemId) || null;
   };
 
-  // 检查必选项：上衣（上装或连衣裙）+ 下装（下装或连衣裙）+ 鞋子
-  const checkRequired = () => {
-    const hasTop = TOP_CATS.some(name => {
-      const cat = categories.find(c => c.name === name);
-      return cat && selections[cat.id];
+  const requiredSteps = useMemo(
+    () => [
+      { key: 'top', label: '上装', names: TOP_CATS },
+      { key: 'bottom', label: '下装', names: BOTTOM_CATS },
+      { key: 'shoe', label: '鞋子', names: SHOE_CATS },
+    ],
+    []
+  );
+
+  const stepStates = useMemo(() => {
+    const states = requiredSteps.map((step) => {
+      const completed = step.names.some((name) => {
+        const cat = categories.find((c) => c.name === name);
+        return cat && selections[cat.id];
+      });
+      return { ...step, completed };
     });
-    const hasBottom = BOTTOM_CATS.some(name => {
-      const cat = categories.find(c => c.name === name);
-      return cat && selections[cat.id];
-    });
-    const hasShoe = SHOE_CATS.some(name => {
-      const cat = categories.find(c => c.name === name);
-      return cat && selections[cat.id];
-    });
-    return hasTop && hasBottom && hasShoe;
+    const firstPendingIndex = states.findIndex((s) => !s.completed);
+    return states.map((s, idx) => ({
+      ...s,
+      status: s.completed ? 'completed' : idx === firstPendingIndex ? 'current' : 'pending',
+    }));
+  }, [requiredSteps, categories, selections]);
+
+  const allSelected = stepStates.every((s) => s.completed);
+
+  const isRequiredCat = (cat: AppCategory) =>
+    cat.name === '上装' || cat.name === '下装' || cat.name === '鞋子';
+
+  const isCatCompleted = (cat: AppCategory) => {
+    if (cat.name === '上装') {
+      return TOP_CATS.some((name) => {
+        const c = categories.find((cc) => cc.name === name);
+        return c && selections[c.id];
+      });
+    }
+    if (cat.name === '下装') {
+      return BOTTOM_CATS.some((name) => {
+        const c = categories.find((cc) => cc.name === name);
+        return c && selections[c.id];
+      });
+    }
+    if (cat.name === '鞋子') {
+      return SHOE_CATS.some((name) => {
+        const c = categories.find((cc) => cc.name === name);
+        return c && selections[c.id];
+      });
+    }
+    return !!selections[cat.id];
   };
 
   const handleTryOn = async () => {
-    if (!checkRequired()) return;
+    if (!allSelected) return;
     setSaving(true);
     try {
-      const itemIds = Object.values(selections);
-
-      // 收集选中物品详情发给后端 AI 试穿
-      const allIt = Object.values(items).flat();
-      const selectedItems = Object.entries(selections).map(([catId, itemId]) => {
-        const it = allIt.find(i => i.id === itemId);
-        const cat = categories.find(c => c.id === catId);
-        return { id: itemId, name: it?.name || '', image: it?.image || '', catName: cat?.name || '' };
+      const allIt: AppItem[] = Object.values(items).flat();
+      const selectedItems: { id: string; name: string; image: string; catName: string }[] = Object.entries(
+        selections
+      ).map(([catId, itemId]) => {
+        const it = allIt.find((i) => i.id === itemId);
+        const cat = categories.find((c) => c.id === catId);
+        return {
+          id: itemId,
+          name: it?.name || '',
+          image: it?.image || '',
+          catName: cat?.name || '',
+        };
       });
 
       const tryOnResult = await tryOnAI(selectedItems, theme);
+      const itemIds = Object.values(selections) as string[];
       const outfit = await createOutfit(itemIds, tryOnResult.image);
       navigate('/outfits/result', {
         state: {
           outfit: { ...outfit, result_image: tryOnResult.image },
+          selectedItems,
           tryOnMode: tryOnResult.mode,
           tryOnMessage: tryOnResult.message,
         },
       });
-    } catch (err: any) {
-      alert(err.message || '试穿失败');
+    } catch (err) {
+      alert(getErrorMessage(err, '试穿失败'));
     } finally {
       setSaving(false);
     }
   };
 
-  const catItems = selectedCat ? (items[selectedCat] || []) : [];
-  const currentCat = categories.find(c => c.id === selectedCat);
-  const allSelected = checkRequired();
-  const selectedCount = Object.keys(selections).length;
-
-  // 分离主分类和剩余分类
-  const primaryCats = categories.filter(c => PRIMARY_CATS.includes(c.name));
-  const moreCats = categories.filter(c => !PRIMARY_CATS.includes(c.name));
-
-  const CAT_ICONS: Record<string, string> = {
-    '上装': '👕', '下装': '👖', '连衣裙': '👗', '袜子': '🧦', '鞋子': '👟',
-    '发饰': '🎀', '耳饰': '💎', '外套': '🧥', '背包': '👜',
-  };
-
-  // 判断某个分类是否被选中
-  const isCatSelected = (catId: string) => !!selections[catId];
-
-  // 必选提示
-  const getMissingHint = () => {
-    const missing = [];
-    const hasTop = TOP_CATS.some(n => { const c = categories.find(cc => cc.name === n); return c && selections[c.id]; });
-    const hasBottom = BOTTOM_CATS.some(n => { const c = categories.find(cc => cc.name === n); return c && selections[c.id]; });
-    const hasShoe = SHOE_CATS.some(n => { const c = categories.find(cc => cc.name === n); return c && selections[c.id]; });
-    if (!hasTop) missing.push('上衣');
-    if (!hasBottom) missing.push('下装');
-    if (!hasShoe) missing.push('鞋子');
-    return missing.join('、');
-  };
+  const catItems = selectedCat ? items[selectedCat] || [] : [];
+  const currentCat = categories.find((c) => c.id === selectedCat);
+  const filteredItems = filterQuery.trim()
+    ? catItems.filter((it) => it.name.toLowerCase().includes(filterQuery.trim().toLowerCase()))
+    : catItems;
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: "'Inter','Noto Sans SC',sans-serif", maxWidth: '375px', margin: '0 auto', background: colors.bg }}>
-      <header className="flex items-center justify-center pt-3 pb-2 h-14">
-        <h1 className="text-xl font-semibold text-gray-900 tracking-tight">搭配</h1>
+    <div className="app-shell min-h-screen bg-bg">
+      {/* Header */}
+      <header className="flex items-center justify-center h-14 px-4">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">搭配</h1>
       </header>
 
       {loading ? (
-        <div className="text-center py-12 text-gray-400">加载中...</div>
+        <div className="flex flex-col items-center justify-center py-20 text-ink-3">
+          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-3" />
+          <p className="text-sm">加载中...</p>
+        </div>
       ) : (
         <>
-          {/* 已选物品栏 */}
-          <div className="px-4 pb-2">
-            <div className="flex items-center gap-2 py-2">
-              <span className="text-xs text-gray-400 whitespace-nowrap">已选 ({selectedCount})</span>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1">
+          {/* Progress Indicator */}
+          <section className="flex items-center justify-center px-8 py-4" aria-label="搭配进度">
+            {stepStates.map((step, idx) => (
+              <div key={step.key} className="flex items-center">
+                <div className="flex flex-col items-center gap-1">
+                  <div
+                    className={cn(
+                      'w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors',
+                      step.status === 'completed' && 'bg-primary text-brand-ink',
+                      step.status === 'current' && 'bg-primary text-brand-ink shadow-[0_0_0_3px_var(--color-primary-light)]',
+                      step.status === 'pending' && 'bg-bg-tertiary text-ink-3'
+                    )}
+                  >
+                    {step.status === 'completed' ? <CheckIcon /> : idx + 1}
+                  </div>
+                  <span
+                    className={cn(
+                      'text-[10px]',
+                      step.status === 'completed' && 'text-primary',
+                      step.status === 'current' && 'text-ink-2',
+                      step.status === 'pending' && 'text-ink-3'
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+                {idx < stepStates.length - 1 && (
+                  <div
+                    className={cn(
+                      'h-0.5 flex-1 max-w-10 mx-2 transition-colors',
+                      step.status === 'completed' ? 'bg-primary' : 'bg-border'
+                    )}
+                  />
+                )}
+              </div>
+            ))}
+          </section>
+
+          {/* Category Tabs */}
+          <section className="px-4 pb-3">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1" role="tablist">
+              {categories.map((cat) => {
+                const active = selectedCat === cat.id;
+                const required = isRequiredCat(cat);
+                const completed = isCatCompleted(cat);
+                return (
+                  <button
+                    key={cat.id}
+                    ref={(el) => { tabRefs.current[cat.id] = el; }}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setSelectedCat(cat.id)}
+                    className={cn(
+                      'relative flex-shrink-0 px-3.5 py-1.5 text-sm font-medium rounded-full border-none outline-none transition-colors duration-150',
+                      active ? 'bg-primary text-brand-ink' : 'bg-bg-tertiary text-ink-2'
+                    )}
+                  >
+                    {cat.name}
+                    {required && !completed && (
+                      <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-error" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Selected Items Preview */}
+          <section className="px-4 pb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-ink-3 whitespace-nowrap">已选</span>
+              <div className="flex gap-2 overflow-x-auto no-scrollbar">
                 {Object.entries(selections).map(([catId]) => {
-                  const cat = categories.find(c => c.id === catId);
+                  const cat = categories.find((c) => c.id === catId);
                   const it = getSelectedItem(catId);
                   return (
-                    <div key={catId}
-                      className="w-10 h-10 rounded-full border-2 flex-shrink-0 flex items-center justify-center relative overflow-hidden"
-                      style={{ borderColor: colors.primary, background: colors.primaryBg }}>
+                    <div
+                      key={catId}
+                      className="relative w-11 h-11 rounded-full border-2 border-primary bg-bg flex-shrink-0 flex items-center justify-center overflow-hidden"
+                    >
                       {it?.image ? (
                         <img src={it.image} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-lg">{CAT_ICONS[cat?.name || ''] || cat?.icon || '📦'}</span>
+                        <span className="text-xl">{CAT_ICONS[cat?.name || ''] || cat?.icon || '📦'}</span>
                       )}
-                      <div className="absolute -bottom-1 -right-1 w-[15px] h-[15px] rounded-full flex items-center justify-center"
-                        style={{ background: colors.primary }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
+                      <div className="absolute -bottom-px -right-px w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                        <SmallCheckIcon className="text-white" />
                       </div>
                     </div>
                   );
                 })}
                 {Object.keys(selections).length === 0 && (
-                  <span className="text-xs text-gray-300 whitespace-nowrap self-center">请选择 上衣 + 下装 + 鞋子</span>
+                  <span className="text-xs text-ink-3 py-2">请先选择搭配物品</span>
                 )}
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="mx-4 h-px" style={{ background: colors.borderLight }} />
+          {/* Divider */}
+          <div className="h-px bg-border-light mx-4" />
 
-          {/* 分类选择区 */}
-          <div className="px-4 py-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              {primaryCats.map(cat => {
-                const isSel = selectedCat === cat.id;
-                const hasSelected = isCatSelected(cat.id);
-                return (
-                  <button key={cat.id}
-                    onClick={() => { setSelectedCat(cat.id); setShowMore(false); }}
-                    className="flex-shrink-0 px-3 py-1.5 text-[13px] font-medium rounded-full transition-all relative flex items-center gap-1 border-0 cursor-pointer"
-                    style={{
-                      background: isSel ? colors.primary : colors.bgTertiary,
-                      color: isSel ? colors.textOnPrimary : colors.textSecondary,
-                      outline: hasSelected && !isSel ? `2px solid ${colors.primary}` : 'none',
-                      outlineOffset: '1px',
-                    }}>
-                    {CAT_ICONS[cat.name] || cat.icon}
-                    {cat.name}
-                    {hasSelected && (
-                      <span className="ml-0.5 w-3.5 h-3.5 rounded-full flex items-center justify-center" style={{ background: isSel ? 'rgba(255,255,255,0.3)' : colors.primary }}>
-                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-
-              {/* 更多 ▼ 按钮 */}
-              {moreCats.length > 0 && (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowMore(!showMore)}
-                    className="flex-shrink-0 px-3 py-1.5 text-[13px] font-medium rounded-full transition-all flex items-center gap-1 border-0 cursor-pointer"
-                    style={{
-                      background: showMore ? colors.primary : colors.bgTertiary,
-                      color: showMore ? colors.textOnPrimary : colors.textSecondary,
-                    }}>
-                    更多
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-                      style={{ transform: showMore ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
-                      <path d="m6 9 6 6 6-6"/>
-                    </svg>
-                  </button>
-
-                  {/* 下拉菜单 */}
-                  {showMore && (
-                    <div className="absolute top-full left-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-100 p-2 z-20 min-w-[120px]"
-                      style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
-                      {moreCats.map(cat => {
-                        const isSel = selectedCat === cat.id;
-                        const hasSelected = isCatSelected(cat.id);
-                        return (
-                          <button key={cat.id}
-                            onClick={() => { setSelectedCat(cat.id); setShowMore(false); }}
-                            className="w-full px-3 py-2 text-[13px] font-medium rounded-lg transition-all flex items-center gap-2 border-0 cursor-pointer text-left"
-                            style={{
-                              background: isSel ? colors.primaryBg : 'transparent',
-                              color: isSel ? colors.primary : colors.textSecondary,
-                            }}>
-                            {CAT_ICONS[cat.name] || cat.icon}
-                            {cat.name}
-                            {hasSelected && (
-                              <span className="ml-auto text-xs px-1.5 py-0.5 rounded" style={{ background: colors.primary, color: 'white' }}>✓</span>
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
+          {/* Item Grid */}
+          <section className="px-4 pt-4 pb-32" aria-label="物品列表">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-ink">
+                {currentCat?.name} · {filterQuery.trim() ? `${filteredItems.length}/${catItems.length}件` : `${catItems.length}件`}
+              </span>
+              <button
+                className={cn(
+                  'flex items-center gap-1 text-xs transition-opacity active:opacity-70',
+                  filterOpen ? 'text-primary' : 'text-ink-3'
+                )}
+                onClick={() => { setFilterOpen(v => !v); if (filterOpen) setFilterQuery(''); }}
+                aria-pressed={filterOpen}
+              >
+                <SlidersHorizontal size={14} />
+                筛选
+              </button>
             </div>
-          </div>
 
-          <div className="mx-4 h-px" style={{ background: colors.borderLight }} />
-
-          {/* 物品网格 */}
-          <div className="px-4 pt-4 pb-4">
-            {currentCat && (
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-gray-900">
-                  {CAT_ICONS[currentCat.name] || currentCat.icon} {currentCat.name}
-                  <span className="text-gray-400 font-normal ml-1">· {catItems.length}件</span>
-                </span>
+            {filterOpen && (
+              <div className="mb-3 animate-fade-in">
+                <input
+                  type="text"
+                  value={filterQuery}
+                  onChange={(e) => setFilterQuery(e.target.value)}
+                  placeholder="搜索物品名称"
+                  className="form-input"
+                  autoFocus
+                />
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2.5">
-              {catItems.map(item => {
+
+            <div className="grid grid-cols-3 gap-3">
+              {filteredItems.map((item) => {
                 const isSelected = selections[item.category_id] === item.id;
                 return (
-                  <div key={item.id}
+                  <div
+                    key={item.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${item.name}${isSelected ? ' 已选择' : ''}`}
                     onClick={() => selectItem(item.category_id, item.id)}
-                    className="rounded-xl overflow-hidden cursor-pointer transition-all active:scale-[0.97]"
-                    style={{
-                      background: colors.bg,
-                      boxShadow: isSelected ? `0 0 0 2px ${colors.primary}` : '0 1px 3px rgba(0,0,0,0.03)',
-                      border: isSelected ? 'none' : `1px solid ${colors.borderLight}`,
-                    }}>
-                    <div className="w-full aspect-square relative" style={{ background: colors.primaryBg }}>
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        selectItem(item.category_id, item.id);
+                      }
+                    }}
+                    className={cn(
+                      'rounded-xl overflow-hidden cursor-pointer transition-all duration-150 active:scale-[0.97] bg-surface shadow-card',
+                      isSelected && 'ring-2 ring-primary ring-offset-0'
+                    )}
+                  >
+                    <div className="w-full aspect-square relative bg-bg-secondary flex items-center justify-center text-[40px]">
                       {item.image ? (
                         <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
-                        <span className="absolute inset-0 flex items-center justify-center text-[36px]">
-                          {CAT_ICONS[currentCat?.name || ''] || '📦'}
-                        </span>
+                        <span>{CAT_ICONS[currentCat?.name || ''] || currentCat?.icon || '📦'}</span>
                       )}
                       {isSelected && (
-                        <div className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-full flex items-center justify-center"
-                          style={{ background: colors.primary }}>
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><path d="M20 6 9 17l-5-5"/></svg>
+                        <div className="absolute top-1.5 right-1.5 w-[22px] h-[22px] rounded-full bg-primary flex items-center justify-center">
+                          <CheckIcon className="text-white" />
                         </div>
                       )}
                     </div>
                     <div className="px-2 py-2 text-center">
-                      <p className="text-xs font-medium truncate" style={{ color: isSelected ? colors.textPrimary : colors.textSecondary }}>
+                      <span
+                        className={cn(
+                          'text-xs font-medium line-clamp-1',
+                          isSelected ? 'text-ink' : 'text-ink-2'
+                        )}
+                      >
                         {item.name}
-                      </p>
-                      {item.price && (
-                        <p className="text-[10px] mt-0.5" style={{ color: colors.primary }}>¥{item.price}</p>
-                      )}
+                      </span>
                     </div>
                   </div>
                 );
               })}
-              {catItems.length === 0 && (
-                <div className="col-span-3 text-center py-6 text-gray-400 text-sm">
-                  暂无物品，先在衣橱中添加
+              {filteredItems.length === 0 && (
+                <div className="col-span-3 text-center py-8 text-ink-3 text-sm">
+                  {filterQuery.trim() ? '没有匹配的物品' : '暂无物品，先在衣橱中添加吧'}
                 </div>
               )}
             </div>
-          </div>
+          </section>
 
           {/* Bottom CTA */}
-          <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[375px] px-4 pt-3 pb-2 bg-gradient-to-t from-white via-white z-10">
+          <section className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[375px] px-4 pt-3 pb-2 bg-gradient-to-t from-bg via-bg to-transparent z-sticky">
             <button
               onClick={handleTryOn}
               disabled={!allSelected || saving}
-              className="w-full py-3.5 rounded-full text-base font-semibold transition-all active:scale-[0.98]"
-              style={{
-                background: allSelected ? colors.primary : colors.bgTertiary,
-                color: allSelected ? colors.textOnPrimary : colors.textTertiary,
-                cursor: allSelected ? 'pointer' : 'not-allowed',
-              }}>
-              {saving ? '生成中...' : allSelected ? '开始试穿' : `请选择 ${getMissingHint()}`}
+              className={cn(
+                'w-full py-3.5 rounded-full text-base font-semibold text-center border-none outline-none transition-colors duration-150',
+                allSelected
+                  ? 'bg-primary text-brand-ink active:scale-[0.98]'
+                  : 'bg-bg-tertiary text-ink-3 cursor-not-allowed'
+              )}
+            >
+              {saving ? '生成中...' : allSelected ? '开始试穿' : '请选择必选分类物品'}
             </button>
-          </div>
+          </section>
         </>
       )}
 

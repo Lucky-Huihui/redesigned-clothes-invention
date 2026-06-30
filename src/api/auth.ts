@@ -7,7 +7,7 @@ export interface User {
   nickname: string;
   avatar: string;
   gender: 'MALE' | 'FEMALE';
-  theme: 'PINK' | 'GRAY';
+  theme: 'PINK' | 'BLUE';
   created_at: string;
 }
 
