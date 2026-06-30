@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建物品 - 衣橱搭配</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen bg-white antialiased">
+    <div class="mx-auto max-w-[375px] min-h-screen flex flex-col">
+
+        <!-- Top Navigation Bar -->
+        <header class="flex items-center justify-center px-4 h-14 border-b border-line/50 shrink-0">
+            <button data-dom-id="back-list" class="absolute left-4 w-9 h-9 flex items-center justify-center rounded-full hover:bg-surface-2 transition-colors duration-150" aria-label="返回">
+                <i data-lucide="arrow-left" class="w-5 h-5 text-ink"></i>
+            </button>
+            <h1 class="text-base font-semibold text-ink tracking-tight">新建物品</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col px-4 pt-5 pb-6 gap-5">
+
+            <!-- Image Upload Area -->
+            <div class="w-full rounded-2xl border-2 border-dashed border-line flex flex-col items-center justify-center bg-surface-2 cursor-pointer hover:border-ink-3 transition-colors duration-150" style="height: 40vh; min-height: 200px;" role="button" aria-label="点击上传照片" tabindex="0">
+                <div class="w-14 h-14 rounded-full bg-white flex items-center justify-center mb-3">
+                    <i data-lucide="camera" class="w-7 h-7 text-ink-3"></i>
+                </div>
+                <span class="text-sm text-ink-3 font-medium">点击上传照片</span>
+            </div>
+
+            <!-- Form Fields -->
+            <div class="flex flex-col gap-4">
+
+                <!-- Item Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="item-name" class="text-sm font-medium text-ink-2">
+                        物品名称<span class="text-state-error ml-0.5">*</span>
+                    </label>
+                    <input id="item-name" type="text" placeholder="请输入物品名称" class="w-full h-11 px-3 rounded-lg bg-surface-2 border border-line text-sm text-ink placeholder:text-ink-3 transition-all duration-150">
+                </div>
+
+                <!-- Price -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="item-price" class="text-sm font-medium text-ink-2">价格（选填）</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-ink-3 font-medium select-none">¥</span>
+                        <input id="item-price" type="number" placeholder="0.00" class="w-full h-11 pl-7 pr-3 rounded-lg bg-surface-2 border border-line text-sm text-ink placeholder:text-ink-3 transition-all duration-150">
+                    </div>
+                </div>
+
+                <!-- Category -->
+                <div class="flex flex-col gap-1.5">
+                    <label for="item-category" class="text-sm font-medium text-ink-2">所属分类</label>
+                    <select id="item-category" class="w-full h-11 px-3 pr-9 rounded-lg bg-surface-2 border border-line text-sm text-ink transition-all duration-150 cursor-pointer">
+                        <option value="tops" selected>上装</option>
+                        <option value="bottoms">下装</option>
+                        <option value="outerwear">外套</option>
+                        <option value="shoes">鞋履</option>
+                        <option value="accessories">配饰</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Spacer -->
+            <div class="flex-1"></div>
+
+            <!-- Save Button -->
+            <button type="button" class="w-full h-12 rounded-full bg-brand text-brand-ink text-base font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-150">
+                保存
+            </button>
+
+        </main>
+
+    </div>
+    <script>lucide.createIcons();</script>
+
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--brand) !important;
+            box-shadow: 0 0 0 2px rgba(232, 160, 191, 0.25);
+        }
+        input::placeholder { color: var(--ink-3); }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    </style>
+</body>
+</html>

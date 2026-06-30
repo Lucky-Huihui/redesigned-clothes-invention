@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 衣橱搭配</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Status bar spacer -->
+    <div style="height: env(safe-area-inset-top, 0);"></div>
+
+    <!-- Profile Card -->
+    <section style="background-color: var(--color-primary-bg); padding: 24px 16px 20px;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <!-- Avatar -->
+        <div style="
+          width: 64px;
+          height: 64px;
+          border-radius: var(--radius-full);
+          background: linear-gradient(135deg, var(--color-primary), var(--color-accent-light));
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        ">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <!-- Name + gender + edit -->
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h1 style="
+              font-family: 'Inter', 'Noto Sans SC', sans-serif;
+              font-size: 20px;
+              font-weight: 600;
+              color: var(--color-text-primary);
+              margin: 0;
+              line-height: 1.3;
+              word-break: keep-all;
+              text-wrap: balance;
+            ">小美的衣橱</h1>
+            <span class="gender-pill">&#9792; 女</span>
+          </div>
+          <div style="margin-top: 10px;">
+            <button class="edit-btn">编辑资料</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Row -->
+    <section style="
+      display: flex;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-light);
+    ">
+      <div style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 0;
+        border-right: 1px solid var(--color-border-light);
+      ">
+        <span class="stat-value" style="font-size: 22px; font-weight: 700; color: var(--color-text-primary);">42</span>
+        <span style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">件物品</span>
+      </div>
+      <div style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 0;
+        border-right: 1px solid var(--color-border-light);
+      ">
+        <span class="stat-value" style="font-size: 22px; font-weight: 700; color: var(--color-text-primary);">8</span>
+        <span style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">个分类</span>
+      </div>
+      <div style="
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 0;
+      ">
+        <span class="stat-value" style="font-size: 22px; font-weight: 700; color: var(--color-text-primary);">15</span>
+        <span style="font-size: 12px; color: var(--color-text-secondary); margin-top: 2px;">次搭配</span>
+      </div>
+    </section>
+
+    <!-- Menu List: Favorites -->
+    <section style="margin-top: 8px; background-color: var(--color-surface);">
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--color-text-primary);">喜欢的搭配</span>
+        <span class="badge-count">5</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div style="height: 1px; background-color: var(--color-border-light); margin-left: 48px;"></div>
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--color-text-primary);">收藏的搭配</span>
+        <span class="badge-count">8</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div style="height: 1px; background-color: var(--color-border-light); margin-left: 48px;"></div>
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--color-text-primary);">不喜欢的搭配</span>
+        <span class="badge-count">2</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section style="margin-top: 8px; background-color: var(--color-surface);">
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <circle cx="13.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/><circle cx="8.5" cy="15.5" r="2.5"/>
+          <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--color-text-primary);">主题切换</span>
+        <span class="theme-indicator">女性主题</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div style="height: 1px; background-color: var(--color-border-light); margin-left: 48px;"></div>
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--color-text-primary);">修改密码</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div style="height: 1px; background-color: var(--color-border-light); margin-left: 48px;"></div>
+      <div class="menu-row">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--state-error)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span style="flex: 1; font-size: 15px; font-weight: 400; color: var(--state-error);">注销账号</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-tertiary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Bottom spacer for tab bar -->
+    <div style="height: 80px;"></div>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="tab-bar">
+      <div style="display: flex; align-items: center; justify-content: space-around; padding: 4px 0 8px;">
+        <a href="#" class="tab-item" data-dom-id="tab-items">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+          </svg>
+          <span>物品</span>
+        </a>
+        <a href="#" class="tab-item" data-dom-id="tab-outfit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5"/><path d="M12 12v9"/><path d="M12 12L4 7.5"/>
+          </svg>
+          <span>搭配</span>
+        </a>
+        <a href="#" class="tab-item active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>个人中心</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+    <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--color-bg-secondary);
+      color: var(--color-text-primary);
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .app-shell {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background-color: var(--color-bg);
+      position: relative;
+      overflow-x: hidden;
+    }
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 375px;
+      background-color: var(--color-surface);
+      border-top: 1px solid var(--color-border-light);
+      z-index: var(--z-sticky);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 8px 0;
+      color: var(--color-text-tertiary);
+      transition: color 150ms ease;
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .tab-item.active {
+      color: var(--color-primary);
+    }
+    .tab-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .menu-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      gap: 12px;
+      transition: background-color 120ms ease;
+      cursor: pointer;
+    }
+    .menu-row:active {
+      background-color: var(--color-bg-secondary);
+    }
+    .badge-count {
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 0 6px;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-value {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    .gender-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 10px;
+      border-radius: var(--radius-full);
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .edit-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 16px;
+      border: 1px solid var(--color-primary);
+      border-radius: var(--radius-full);
+      color: var(--color-primary);
+      font-size: 13px;
+      font-weight: 500;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 150ms ease, color 150ms ease;
+    }
+    .edit-btn:active {
+      background-color: var(--color-primary);
+      color: var(--color-text-on-primary);
+    }
+    .theme-indicator {
+      font-size: 13px;
+      color: var(--color-text-tertiary);
+      margin-right: 4px;
+    }
+  </style>
+</body>
+</html>

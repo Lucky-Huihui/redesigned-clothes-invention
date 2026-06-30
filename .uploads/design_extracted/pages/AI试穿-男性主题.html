@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>衣橱搭配 - 试穿效果</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+      <button class="nav-btn nav-btn-left" data-dom-id="back-outfit" aria-label="返回">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <span class="nav-title">试穿效果</span>
+      <button class="nav-btn nav-btn-right" aria-label="分享">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Main Try-On Display -->
+    <section class="tryon-display" aria-label="试穿预览">
+      <img src="../assets/image_1_yi19x4.jpg" alt="男装试穿效果预览">
+      <span class="tryon-badge">AI 试穿</span>
+    </section>
+
+    <!-- Selected Outfit Summary Strip -->
+    <section class="outfit-strip">
+      <p class="outfit-strip-label">当前搭配</p>
+      <div class="outfit-scroll">
+        <div class="outfit-thumb">
+          <img src="../assets/image_1_yi19x4.jpg" alt="深蓝休闲西装">
+          <span class="outfit-thumb-tag">西装</span>
+        </div>
+        <div class="outfit-thumb">
+          <img src="../assets/image_1_yi19x4.jpg" alt="白色衬衫">
+          <span class="outfit-thumb-tag">衬衫</span>
+        </div>
+        <div class="outfit-thumb">
+          <img src="../assets/image_1_yi19x4.jpg" alt="深色直筒裤">
+          <span class="outfit-thumb-tag">西裤</span>
+        </div>
+        <div class="outfit-thumb">
+          <img src="../assets/image_1_yi19x4.jpg" alt="棕色皮带">
+          <span class="outfit-thumb-tag">皮带</span>
+        </div>
+        <div class="outfit-thumb">
+          <img src="../assets/image_1_yi19x4.jpg" alt="黑色皮鞋">
+          <span class="outfit-thumb-tag">皮鞋</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feedback Buttons -->
+    <div class="feedback-group">
+      <button class="fb-btn fb-dislike" aria-label="不喜欢">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+        不喜欢
+      </button>
+      <button class="fb-btn fb-fav" aria-label="收藏">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+        </svg>
+        收藏
+      </button>
+      <button class="fb-btn fb-like" aria-label="喜欢">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2h0a3.13 3.13 0 0 1 3 3.88Z"/>
+        </svg>
+        喜欢
+      </button>
+    </div>
+
+    <!-- Bottom Action -->
+    <div class="bottom-action">
+      <button class="btn-outline" aria-label="重新搭配">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+          <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+        </svg>
+        重新搭配
+      </button>
+    </div>
+
+  </div>
+
+    <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text-primary);
+      -webkit-font-smoothing: antialiased;
+    }
+    .app-shell {
+      max-width: 375px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: var(--color-bg);
+      overflow-x: hidden;
+    }
+    /* Top nav */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: var(--z-sticky);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-light);
+      padding: 0 20px;
+    }
+    .nav-btn {
+      position: absolute;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 150ms cubic-bezier(.2,.8,.2,1);
+    }
+    .nav-btn:active { opacity: 0.6; }
+    .nav-btn svg { width: 22px; height: 22px; }
+    .nav-btn-left { left: 16px; }
+    .nav-btn-right { right: 16px; }
+    .nav-title {
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      letter-spacing: -0.01em;
+    }
+    /* Main image area */
+    .tryon-display {
+      margin: 16px 16px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--color-bg-secondary);
+      aspect-ratio: 3 / 4;
+      position: relative;
+    }
+    .tryon-display img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .tryon-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(59, 89, 152, 0.85);
+      color: #fff;
+      font-size: 11px;
+      font-weight: var(--font-weight-medium);
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+    /* Outfit summary strip */
+    .outfit-strip {
+      margin: 16px 0 0;
+      padding: 0 16px;
+    }
+    .outfit-strip-label {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
+      margin-bottom: 10px;
+    }
+    .outfit-scroll {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .outfit-scroll::-webkit-scrollbar { display: none; }
+    .outfit-thumb {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--color-bg-tertiary);
+      border: 2px solid var(--color-primary);
+      position: relative;
+    }
+    .outfit-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .outfit-thumb-tag {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      font-size: 10px;
+      text-align: center;
+      padding: 2px 0;
+      font-weight: var(--font-weight-medium);
+    }
+    /* Feedback buttons */
+    .feedback-group {
+      display: flex;
+      gap: 10px;
+      padding: 20px 16px 0;
+    }
+    .fb-btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 48px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      font-family: inherit;
+      transition: transform 120ms cubic-bezier(.2,.8,.2,1), opacity 120ms cubic-bezier(.2,.8,.2,1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .fb-btn:active { transform: scale(0.97); }
+    .fb-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .fb-dislike {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+    .fb-fav {
+      background: var(--color-primary-subtle);
+      color: var(--color-primary);
+    }
+    .fb-like {
+      background: var(--color-primary);
+      color: var(--color-text-on-primary);
+    }
+    /* Bottom action */
+    .bottom-action {
+      padding: 20px 16px 40px;
+    }
+    .btn-outline {
+      width: 100%;
+      height: 48px;
+      border-radius: 10px;
+      border: 2px solid var(--color-primary);
+      background: transparent;
+      color: var(--color-primary);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 150ms cubic-bezier(.2,.8,.2,1), transform 120ms cubic-bezier(.2,.8,.2,1);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-outline:active {
+      background: var(--color-primary-bg);
+      transform: scale(0.98);
+    }
+    .btn-outline svg { width: 20px; height: 20px; }
+  </style>
+</body>
+</html>

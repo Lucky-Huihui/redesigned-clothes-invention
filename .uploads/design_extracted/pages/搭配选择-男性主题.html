@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搭配选择 - 衣橱搭配</title>
+    <style id="theme-vars">
+:root {
+  /* === Brand Identity === */
+  --color-primary: #E8A0BF;
+  --color-primary-hover: #D98AAE;
+  --color-primary-light: #F5D5E5;
+  --color-primary-bg: #FDF2F8;
+  --color-primary-subtle: #FCEEF5;
+
+  /* === Neutral Palette === */
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F9FAFB;
+  --color-bg-tertiary: #F3F4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F3F4F6;
+  --color-divider: #F3F4F6;
+
+  /* === Text === */
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-inverse: #FFFFFF;
+  --color-text-on-primary: #FFFFFF;
+
+  /* === State Colors === */
+  --state-success: #10B981;
+  --state-warning: #F59E0B;
+  --state-error: #EF4444;
+  --state-info: #3B82F6;
+
+  /* === Accent (Rose Gold) === */
+  --color-accent: #B76E79;
+  --color-accent-light: #D4A0A7;
+
+  /* === Typography === */
+  --font-family-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Inter', 'Noto Sans SC', sans-serif;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* === Spacing === */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* === Radius === */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* === Shadow === */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.03);
+
+  /* === Transition === */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+
+  /* === Z-index === */
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* === Male Theme Override === */
+[data-theme="male"] {
+  --color-primary: #3B5998;
+  --color-primary-hover: #2D4373;
+  --color-primary-light: #C5D3E8;
+  --color-primary-bg: #EFF3FA;
+  --color-primary-subtle: #E8EDF5;
+
+  --color-accent: #F59E0B;
+  --color-accent-light: #FCD34D;
+
+  --color-bg-secondary: #F8FAFC;
+  --color-bg-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-light: #F1F5F9;
+  --color-divider: #F1F5F9;
+
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* === Typography Classes === */
+.text-heading-1 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.025em;
+}
+
+.text-heading-2 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+  letter-spacing: -0.015em;
+}
+
+.text-heading-3 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-primary);
+}
+
+.text-body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.text-body-secondary {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+.text-caption {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-tertiary);
+}
+
+.text-label {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-secondary);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-accent: var(--color-accent);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-surface); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main class="max-w-[375px] mx-auto bg-white min-h-screen pb-24">
+
+        <!-- Header -->
+        <header class="sticky top-0 z-20 bg-white/95 backdrop-blur-sm border-b" style="border-color: var(--color-border-light);">
+            <div class="flex items-center justify-center h-14 px-4">
+                <h1 class="text-lg font-semibold" style="color: var(--color-text-primary);">搭配</h1>
+            </div>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="px-4 pt-4 pb-2">
+            <div class="flex items-center justify-center gap-1 text-sm">
+                <span class="flex items-center gap-1 font-medium" style="color: var(--color-primary);">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs text-white" style="background: var(--color-primary);">
+                        <i data-lucide="check" class="w-3 h-3"></i>
+                    </span>
+                    上装
+                </span>
+                <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+                <span class="flex items-center gap-1 font-medium" style="color: var(--color-primary);">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-semibold" style="background: var(--color-primary-bg); color: var(--color-primary);">2</span>
+                    下装
+                </span>
+                <i data-lucide="chevron-right" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+                <span class="flex items-center gap-1" style="color: var(--color-text-tertiary);">
+                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs" style="background: var(--color-bg-tertiary); color: var(--color-text-tertiary);">3</span>
+                    鞋子
+                </span>
+            </div>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="px-4 pt-2 pb-3">
+            <div class="flex gap-2 overflow-x-auto no-scrollbar">
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full text-white" style="background: var(--color-primary);">上装</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">下装</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">袜子</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full relative" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">
+                    鞋子
+                    <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style="background: var(--color-accent);"></span>
+                </button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">发饰</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">耳饰</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">外套</button>
+                <button class="flex-shrink-0 px-4 py-1.5 text-sm font-medium rounded-full" style="background: var(--color-bg-tertiary); color: var(--color-text-secondary);">背包</button>
+            </div>
+        </div>
+
+        <!-- Selected Items Preview -->
+        <div class="px-4 pb-3">
+            <div class="flex items-center gap-3 py-2">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full overflow-hidden ring-2" style="--tw-ring-color: var(--color-primary);">
+                        <div class="w-full h-full" style="background: var(--color-primary-subtle);"></div>
+                    </div>
+                    <span class="text-xs" style="color: var(--color-text-secondary);">上装已选</span>
+                </div>
+                <div class="w-px h-6" style="background: var(--color-divider);"></div>
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center" style="border-color: var(--color-border);">
+                        <i data-lucide="plus" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+                    </div>
+                    <span class="text-xs" style="color: var(--color-text-tertiary);">选择下装</span>
+                </div>
+                <div class="w-px h-6" style="background: var(--color-divider);"></div>
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center" style="border-color: var(--color-border);">
+                        <i data-lucide="plus" class="w-4 h-4" style="color: var(--color-text-tertiary);"></i>
+                    </div>
+                    <span class="text-xs" style="color: var(--color-text-tertiary);">选择鞋子</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="mx-4" style="height: 1px; background: var(--color-divider);"></div>
+
+        <!-- Item Grid Section -->
+        <div class="px-4 pt-3 pb-2">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-medium" style="color: var(--color-text-primary);">上装 · 12件</span>
+                <button class="flex items-center gap-1 text-xs" style="color: var(--color-primary);">
+                    <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i>
+                    筛选
+                </button>
+            </div>
+        </div>
+
+        <!-- 3-Column Item Grid -->
+        <div class="px-4 pb-4">
+            <div class="grid grid-cols-3 gap-2.5">
+                <!-- Item 1 - Selected -->
+                <div class="relative rounded-lg overflow-hidden" style="border: 2px solid var(--color-primary);">
+                    <div class="aspect-square" style="background: var(--color-primary-subtle);"></div>
+                    <div class="absolute top-1.5 right-1.5 w-5 h-5 rounded-full flex items-center justify-center" style="background: var(--color-primary);">
+                        <i data-lucide="check" class="w-3 h-3 text-white"></i>
+                    </div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">深蓝衬衫</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">商务休闲</p>
+                    </div>
+                </div>
+                <!-- Item 2 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #E8EDF5;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">白色T恤</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">日常</p>
+                    </div>
+                </div>
+                <!-- Item 3 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #F1F5F9;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">灰色卫衣</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">休闲</p>
+                    </div>
+                </div>
+                <!-- Item 4 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #E2E8F0;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">黑色Polo</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">运动</p>
+                    </div>
+                </div>
+                <!-- Item 5 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #EFF3FA;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">条纹衬衫</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">商务</p>
+                    </div>
+                </div>
+                <!-- Item 6 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #F8FAFC;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">牛仔外套</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">休闲</p>
+                    </div>
+                </div>
+                <!-- Item 7 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #E8EDF5;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">卡其夹克</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">户外</p>
+                    </div>
+                </div>
+                <!-- Item 8 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #F1F5F9;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">运动背心</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">健身</p>
+                    </div>
+                </div>
+                <!-- Item 9 -->
+                <div class="rounded-lg overflow-hidden" style="border: 1px solid var(--color-border-light);">
+                    <div class="aspect-square" style="background: #E2E8F0;"></div>
+                    <div class="p-1.5">
+                        <p class="text-xs font-medium truncate" style="color: var(--color-text-primary);">格子衬衫</p>
+                        <p class="text-xs truncate" style="color: var(--color-text-tertiary);">日常</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom CTA -->
+        <div class="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[375px] px-4 pb-3 pt-2 bg-gradient-to-t from-white via-white to-transparent z-10">
+            <button data-dom-id="start-tryon" class="w-full py-3 rounded-lg text-base font-semibold text-white transition-colors duration-150" style="background: var(--color-primary);">
+                开始试穿
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Bottom Tab Bar -->
+    <nav class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[375px] bg-white border-t z-30" style="border-color: var(--color-border-light);">
+        <div class="flex items-center justify-around h-16 pb-safe">
+            <a href="#" data-dom-id="tab-items" class="flex flex-col items-center gap-0.5 py-1" style="color: var(--color-text-tertiary);">
+                <i data-lucide="shirt" class="w-5 h-5"></i>
+                <span class="text-xs">物品</span>
+            </a>
+            <a href="#" class="flex flex-col items-center gap-0.5 py-1" style="color: var(--color-primary);">
+                <i data-lucide="palette" class="w-5 h-5"></i>
+                <span class="text-xs font-medium">搭配</span>
+            </a>
+            <a href="#" data-dom-id="tab-profile" class="flex flex-col items-center gap-0.5 py-1" style="color: var(--color-text-tertiary);">
+                <i data-lucide="user" class="w-5 h-5"></i>
+                <span class="text-xs">个人中心</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

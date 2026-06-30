@@ -2,8 +2,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-
 import { Provider } from 'react-redux';
 import { store, useAppSelector } from '@/store';
 import { getToken } from '@/api/client';
-import { usePWAInstall, InstallBanner } from '@/components/PWAInstall';
-import { useState } from 'react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import InstallBanner from '@/components/InstallBanner';
+import { useState, useEffect } from 'react';
+import { themeDataAttr } from '@/utils/theme';
 import Login from '@/pages/Login';
 import Items from '@/pages/Items';
 import CategoryDetail from '@/pages/CategoryDetail';
@@ -15,6 +17,19 @@ import EditProfile from '@/pages/EditProfile';
 import Reactions from '@/pages/Reactions';
 import NewItem from '@/pages/NewItem';
 import ItemDetail from '@/pages/ItemDetail';
+
+function ThemeRoot({ children }: { children: React.ReactNode }) {
+  const theme = useAppSelector((s) => s.theme.theme);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', themeDataAttr(theme));
+    const themeColor = theme === 'BLUE' ? '#3B5998' : '#E8A0BF';
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', themeColor);
+  }, [theme]);
+
+  return <>{children}</>;
+}
 
 function RequireAuth() {
   const user = useAppSelector((s) => s.auth.user);
@@ -79,7 +94,9 @@ function AppRoutes() {
 export default function App() {
   return (
     <Provider store={store}>
-      <AppRoutes />
+      <ThemeRoot>
+        <AppRoutes />
+      </ThemeRoot>
     </Provider>
   );
 }

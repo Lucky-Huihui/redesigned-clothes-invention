@@ -1,5 +1,5 @@
 export type Gender = 'MALE' | 'FEMALE';
-export type Theme = 'PINK' | 'GRAY';
+export type Theme = 'PINK' | 'BLUE';
 export type ReactionType = 'LIKE' | 'FAVORITE' | 'DISLIKE';
 
 export interface AppUser {
